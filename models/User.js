@@ -5,13 +5,17 @@ var userSchema = new Schema({
     name: String,
     userName: String,
     email: String,
-    password: String,
+    password: {
+        type: String,
+        select: false,
+    },
     role: {
         type: String,
         enum: ['employee', 'manager'],
         default: 'employee'
     },
-    created_at: { type: Date, default: Date.now }
+    created_at: { type: Date, default: Date.now },
+    login_at: { type: Date }
 });
 
 module.exports = mongoose.model('User', userSchema);

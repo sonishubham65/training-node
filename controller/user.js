@@ -12,7 +12,6 @@ const signupSchema = Joi.object({
         .pattern(new RegExp(/^[A-Z a-z 0-9.]+$/))
         .error(errors => {
             errors.forEach(error => {
-                console.log(error);
                 switch (error.code) {
                     case 'string.pattern.base': {
                         error.message = '"Name" should contain letters and number only';
@@ -29,7 +28,6 @@ const signupSchema = Joi.object({
         .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,30}$'))
         .error(errors => {
             errors.forEach(error => {
-                console.log(error);
                 switch (error.code) {
                     case 'string.pattern.base': {
                         error.message = '"Password" should contain at least a capital letter, a small letter, a number and a special charcter';
@@ -102,7 +100,6 @@ const loginSchema = Joi.object({
         .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,30}$'))
         .error(errors => {
             errors.forEach(error => {
-                console.log(error);
                 switch (error.code) {
                     case 'string.pattern.base': {
                         error.message = '"Password" should contain at least a capital letter, a small letter, a number and a special charcter';
@@ -127,13 +124,14 @@ module.exports.login = async (req) => {
             message: error.message
         }
     } else {
-        var user = await User.findOne({ email: value.email });
+        var user = await User.findOne({ email: value.email }).select('+password');
         if (user) {
             // Compare password
             let result = await bcrypt.compare(value.password, user.password);
-
             if (result) {
                 var token = JWT.sign({ _id: user._id }, process.env.JWT_passphrase);
+                user.login_at = Date.now();
+                let result = await user.save();
                 // return successful
                 return {
                     statusCode: 200,

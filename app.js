@@ -1,4 +1,4 @@
-require('dotenv').config()
+require('dotenv').config({ path: `./env/${process.env.ENVIRONMENT}.env` })
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
@@ -45,7 +45,7 @@ const mongoose = require('mongoose');
 mongoose.connect(`${process.env.DBURI}/${process.env.DBNAME}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.listen(process.env.PORT, () => {
-  console.log("Server is started.");
+  console.log(`Server is started on ${process.env.ENVIRONMENT}`);
 })
 
 module.exports = app;
