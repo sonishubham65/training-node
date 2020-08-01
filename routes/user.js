@@ -13,4 +13,15 @@ router.post('/signup', async (req, res, next) => {
   }
 });
 
+router.post('/login', async (req, res, next) => {
+  try {
+    let loginResponse = await user.login(req);
+    res.status(loginResponse.statusCode).json({ message: loginResponse.message, data: loginResponse.data, token: loginResponse.token })
+  } catch (e) {
+    res.status(500).json({
+      messag: e.message
+    })
+  }
+});
+
 module.exports = router;
