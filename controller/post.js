@@ -1,6 +1,6 @@
 const Post = require('../models/Post');
 const Joi = require('@hapi/joi');
-// Signup request Schema validator
+// Schema for a new Post
 const postAddSchema = Joi.object({
     project_name: Joi.string()
         .min(3)
@@ -79,7 +79,7 @@ const postAddSchema = Joi.object({
 /**
  * 
  * @param {*} req 
- * @description: This function register a user and throw an error if resource is duplicate.
+ * @description: This function add a post
  */
 module.exports.add = async (req) => {
     // validation
