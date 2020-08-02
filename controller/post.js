@@ -97,6 +97,7 @@ module.exports.add = async (req) => {
             project_name: value.project_name,
             client_name: value.client_name,
             technologies: value.technologies,
+            user_id: req.user._id,
             role: value.role,
             description: value.description,
             status: value.status,
