@@ -57,7 +57,8 @@ module.exports.signup = async (req) => {
         // return with validation error message
         return {
             statusCode: 422,
-            message: error.message
+            message: error.message,
+            errorStack: error.details[0].path
         }
     } else {
         var user = await User.findOne({ email: value.email });
@@ -121,7 +122,8 @@ module.exports.login = async (req) => {
         // return with validation error message
         return {
             statusCode: 422,
-            message: error.message
+            message: error.message,
+            errorStack: error.details[0].path
         }
     } else {
         var user = await User.findOne({ email: value.email }).select('+password');

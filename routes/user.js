@@ -4,8 +4,8 @@ var router = express.Router();
 const user = require('../controller/user');
 router.post('/signup', async (req, res, next) => {
   try {
-    let signupResponse = await user.signup(req);
-    res.status(signupResponse.statusCode).json({ message: signupResponse.message })
+    let response = await user.signup(req);
+    res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack })
   } catch (e) {
     res.status(500).json({
       messag: e.message
@@ -15,8 +15,8 @@ router.post('/signup', async (req, res, next) => {
 
 router.post('/login', async (req, res, next) => {
   try {
-    let loginResponse = await user.login(req);
-    res.status(loginResponse.statusCode).json({ message: loginResponse.message, data: loginResponse.data, token: loginResponse.token })
+    let response = await user.login(req);
+    res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data, token: response.token })
   } catch (e) {
     res.status(500).json({
       messag: e.message
