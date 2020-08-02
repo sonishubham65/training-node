@@ -15,9 +15,10 @@ describe("User API", () => {
                     "password": "Pass@123",
                     "role": "employee"
                 }).then((response) => {
-                    expect(response.statusCode).to.equal(422)
-                    expect(response.body).to.be.an('object').that.has.property('message')
-                    expect(response.body.message).to.be.a("string")
+                    expect(response.statusCode).to.equal(422);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    expect(response.body.errorStack).to.be.an("array");
                     done();
                 }).catch(err => {
                     done(err)
@@ -34,7 +35,7 @@ describe("User API", () => {
                 }).then((response) => {
                     expect(response.statusCode).to.equal(409);
                     expect(response.body).to.be.an('object').that.has.property('message');
-                    expect(response.body.message).to.be.a("string")
+                    expect(response.body.message).to.be.a("string");
                     done();
                 }).catch(err => {
                     done(err)
@@ -51,7 +52,7 @@ describe("User API", () => {
                 }).then((response) => {
                     expect(response.statusCode).to.equal(201);
                     expect(response.body).to.be.an('object').that.has.property('message');
-                    expect(response.body.message).to.be.a("string")
+                    expect(response.body.message).to.be.a("string");
                     done();
                 }).catch(err => {
                     done(err)
@@ -68,7 +69,7 @@ describe("User API", () => {
                 }).then((response) => {
                     expect(response.statusCode).to.equal(201);
                     expect(response.body).to.be.an('object').that.has.property('message');
-                    expect(response.body.message).to.be.a("string")
+                    expect(response.body.message).to.be.a("string");
                     done();
                 }).catch(err => {
                     done(err)
@@ -85,9 +86,10 @@ describe("User API", () => {
                     "email": "employee@nagarro.com",
                     "password": "Pass123",
                 }).then((response) => {
-                    expect(response.statusCode).to.equal(422)
-                    expect(response.body).to.be.an('object').that.has.property('message')
-                    expect(response.body.message).to.be.a("string")
+                    expect(response.statusCode).to.equal(422);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    expect(response.body.errorStack).to.be.an("array");
                     done();
                 }).catch(err => {
                     done(err)
@@ -102,7 +104,7 @@ describe("User API", () => {
                 }).then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
-                    expect(response.body.message).to.be.a("string")
+                    expect(response.body.message).to.be.a("string");
                     done();
                 }).catch(err => {
                     done(err)
@@ -116,9 +118,9 @@ describe("User API", () => {
                     "password": "Pass@123",
                 }).then((response) => {
                     expect(response.statusCode).to.equal(200);
-                    expect(response.body).to.contain.all.keys('data', 'token')
-                    expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at')
-                    expect(response.body.data.role).to.equal('employee')
+                    expect(response.body).to.contain.all.keys('data', 'token');
+                    expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
+                    expect(response.body.data.role).to.equal('employee');
                     done();
                 }).catch(err => {
                     done(err)
@@ -131,9 +133,9 @@ describe("User API", () => {
                     "password": "Pass@123",
                 }).then((response) => {
                     expect(response.statusCode).to.equal(200);
-                    expect(response.body).to.contain.all.keys('data', 'token')
-                    expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at')
-                    expect(response.body.data.role).to.equal('manager')
+                    expect(response.body).to.contain.all.keys('data', 'token');
+                    expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
+                    expect(response.body.data.role).to.equal('manager');
                     done();
                 }).catch(err => {
                     done(err)
