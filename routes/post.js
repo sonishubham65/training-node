@@ -2,8 +2,9 @@ var express = require('express');
 var router = express.Router();
 
 const post = require('../controller/post');
-const auth = require('../middleware/authentication');
-router.post('/add', auth, async (req, res, next) => {
+const authentication = require('../middleware/authentication');
+const authorization = require('../middleware/authorization');
+router.post('/add', authentication, authorization.manager, async (req, res, next) => {
     try {
         let response = await post.add(req);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })

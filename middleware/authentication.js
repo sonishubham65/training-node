@@ -11,7 +11,6 @@ module.exports = async (req, res, next) => {
             let result = JWT.verify(token, process.env.JWT_passphrase);
             if (result._id) {
                 let user = await User.findById(result._id);
-                console.log(user);
                 if (user) {
                     req.user = user;
                     next();
