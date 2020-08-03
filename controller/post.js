@@ -1,5 +1,6 @@
 const Post = require('../models/Post');
 const Joi = require('@hapi/joi');
+
 // Schema for a new Post
 const postAddSchema = Joi.object({
     project_name: Joi.string()
@@ -75,6 +76,14 @@ const postAddSchema = Joi.object({
     status: Joi.any().allow('open', 'closed').label("Status").required(),
 });
 
+// Schema for a list page
+const postListSchema = Joi.object({
+    page: Joi.number()
+        .min(1)
+        .label("Page")
+        .required()
+});
+
 
 /**
  * 
@@ -111,4 +120,39 @@ module.exports.add = async (req) => {
             }
         }
     }
+}
+
+/**
+ * 
+ * @param {*} req 
+ * @description: This function gets a list of post
+ */
+module.exports.list = async (req) => {
+    // validation
+    var { error, value } = await postListSchema.validate(req.params);
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
+        let find = { user_id: req.user._id };
+        let limit = 10;
+        let skip = (value.page - 1) * limit;
+        let count = await Post.find(find).count();
+        let posts;
+        if (count) {
+            posts = await Post.find(find).skip(skip).limit(limit);
+        }
+        return {
+            statusCode: 200,
+            data: {
+                posts: posts,
+                count: count
+            }
+        }
+    }
+
 }

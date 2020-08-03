@@ -14,4 +14,14 @@ router.post('/add', authentication, authorization.manager, async (req, res, next
         })
     }
 });
+router.get('/page/:page', authentication, authorization.manager, async (req, res, next) => {
+    try {
+        let response = await post.list(req);
+        res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
+    } catch (e) {
+        res.status(500).json({
+            messag: e.message
+        })
+    }
+});
 module.exports = router;
