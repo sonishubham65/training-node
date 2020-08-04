@@ -318,5 +318,49 @@ describe("Post API", () => {
         })
     })
 
+    context('--Delete a Post', () => {
+        it("--authentication", (done) => {
+            chai.request(server)
+                .delete(`/post/${postId}`).then((response) => {
+                    expect(response.statusCode).to.equal(401);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("--authorization", (done) => {
+            chai.request(server)
+                .delete(`/post/${postId}`).set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                    expect(response.statusCode).to.equal(403);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("delete a post", (done) => {
+            chai.request(server)
+                .delete(`/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("delete a post again", (done) => {
+            chai.request(server)
+                .delete(`/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(204);
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+    })
 
 })
