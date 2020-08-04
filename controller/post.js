@@ -183,5 +183,4 @@ module.exports.list = async (req) => {
             }
         }
     }
-
 }

@@ -84,5 +84,62 @@ describe("Post API", () => {
                     done(err)
                 })
         })
+        it("List all post, with Project Name", (done) => {
+            chai.request(server)
+                .get("/post/page/1?project_name=ging").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body).to.be.an('object').that.has.property('data');
+                    expect(response.body.data).to.contain.all.keys("posts", "count");
+                    expect(response.body.data.count).to.be.a("number");
+                    if (response.body.data.posts.length > 0) {
+                        for (let i = 0; i < response.body.data.posts.length; i++) {
+                            let post = response.body.data.posts[i];
+                            expect(post).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
+                            expect(post.technologies).to.be.an("array");
+                            expect(new Date(post.created_at)).to.be.an.a("date");
+                        }
+                    }
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
+        it("List all post, with ID", (done) => {
+            chai.request(server)
+                .get("/post/page/1?_id=5f28fa7d9dc60a5d4c0fa864").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body).to.be.an('object').that.has.property('data');
+                    expect(response.body.data).to.contain.all.keys("posts", "count");
+                    expect(response.body.data.count).to.be.a("number");
+                    if (response.body.data.posts.length == 1) {
+                        let post = response.body.data.posts[0];
+                        expect(post).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
+                        expect(post.technologies).to.be.an("array");
+                        expect(new Date(post.created_at)).to.be.an.a("date");
+                    }
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
+        it("List all post, page count exceed limit", (done) => {
+            chai.request(server)
+                .get("/post/page/1000000").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body).to.be.an('object').that.has.property('data');
+                    expect(response.body.data).to.contain.all.keys("posts", "count");
+                    expect(response.body.data.count).to.be.a("number");
+                    expect(response.body.data.posts).to.be.an("array");
+                    expect(response.body.data.posts.length).to.be.equal(0);
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
     })
 })
