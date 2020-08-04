@@ -1,113 +1,113 @@
 const Post = require('../models/Post');
 const Joi = require('@hapi/joi');
-
-// Schema for a new Post
-const postAddSchema = Joi.object({
-    project_name: Joi.string()
-        .min(3)
-        .max(60)
-        .label("Project name")
-        .required()
-        .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
-        .error(errors => {
-            errors.forEach(error => {
-                switch (error.code) {
-                    case 'string.pattern.base': {
-                        error.message = '"Project name" should contain letters and number only';
-                    } break;
-                }
-            })
-            return errors;
-        }),
-    client_name: Joi.string()
-        .min(3)
-        .max(30)
-        .label("Client name")
-        .required()
-        .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
-        .error(errors => {
-            errors.forEach(error => {
-                switch (error.code) {
-                    case 'string.pattern.base': {
-                        error.message = '"Client name" should contain letters and number only';
-                    } break;
-                }
-            })
-            return errors;
-        }),
-    technologies: Joi.array().items(
-        Joi.string()
-            .min(1)
-            .max(50)
-            .label("Technology")
+const Schema = {
+    // Schema for a Post
+    post: Joi.object({
+        project_name: Joi.string()
+            .min(3)
+            .max(60)
+            .label("Project name")
             .required()
             .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
             .error(errors => {
                 errors.forEach(error => {
                     switch (error.code) {
                         case 'string.pattern.base': {
-                            error.message = 'A "Technology" should contain letters and number only';
+                            error.message = '"Project name" should contain letters and number only';
+                        } break;
+                    }
+                })
+                return errors;
+            }),
+        client_name: Joi.string()
+            .min(3)
+            .max(30)
+            .label("Client name")
+            .required()
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .error(errors => {
+                errors.forEach(error => {
+                    switch (error.code) {
+                        case 'string.pattern.base': {
+                            error.message = '"Client name" should contain letters and number only';
+                        } break;
+                    }
+                })
+                return errors;
+            }),
+        technologies: Joi.array().items(
+            Joi.string()
+                .min(1)
+                .max(50)
+                .label("Technology")
+                .required()
+                .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+                .error(errors => {
+                    errors.forEach(error => {
+                        switch (error.code) {
+                            case 'string.pattern.base': {
+                                error.message = 'A "Technology" should contain letters and number only';
+                            } break;
+                        }
+                    })
+                    return errors;
+                })
+        )
+            .label("Technologies")
+            .required(),
+        role: Joi.any().allow('trainee', 'associate', 'senior_associate', 'lead', 'manager', 'director').label("Role").required(),
+        description: Joi.string()
+            .min(100)
+            .max(1000)
+            .label("Description")
+            .required()
+            .pattern(new RegExp(/^[A-Z a-z 0-9.'-@# ,?"*&]+$/))
+            .error(errors => {
+                errors.forEach(error => {
+                    switch (error.code) {
+                        case 'string.pattern.base': {
+                            error.message = '"Description" should contain letters and number only';
+                        } break;
+                    }
+                })
+                return errors;
+            }),
+
+        status: Joi.any().allow('open', 'closed').label("Status").required(),
+    }),
+    // Schema for a list post
+    list: Joi.object({
+        page: Joi.number()
+            .min(1)
+            .label("Page")
+            .required(),
+        _id: Joi.string()
+            .alphanum()
+            .label("_id"),
+        project_name: Joi.string()
+            .min(3)
+            .max(60)
+            .label("Project name")
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .error(errors => {
+                errors.forEach(error => {
+                    switch (error.code) {
+                        case 'string.pattern.base': {
+                            error.message = '"Project name" should contain letters and number only';
                         } break;
                     }
                 })
                 return errors;
             })
-    )
-        .label("Technologies")
-        .required(),
-    role: Joi.any().allow('trainee', 'associate', 'senior_associate', 'lead', 'manager', 'director').label("Role").required(),
-    description: Joi.string()
-        .min(100)
-        .max(1000)
-        .label("Description")
-        .required()
-        .pattern(new RegExp(/^[A-Z a-z 0-9.'-@# ,?"*&]+$/))
-        .error(errors => {
-            errors.forEach(error => {
-                switch (error.code) {
-                    case 'string.pattern.base': {
-                        error.message = '"Description" should contain letters and number only';
-                    } break;
-                }
-            })
-            return errors;
-        }),
+    }),
+    // Schema for a post
+    get: Joi.object({
+        _id: Joi.string()
+            .alphanum()
+            .label("_id")
+    })
+}
 
-    status: Joi.any().allow('open', 'closed').label("Status").required(),
-});
-
-// Schema for a list post
-const postListSchema = Joi.object({
-    page: Joi.number()
-        .min(1)
-        .label("Page")
-        .required(),
-    _id: Joi.string()
-        .alphanum()
-        .label("_id"),
-    project_name: Joi.string()
-        .min(3)
-        .max(60)
-        .label("Project name")
-        .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
-        .error(errors => {
-            errors.forEach(error => {
-                switch (error.code) {
-                    case 'string.pattern.base': {
-                        error.message = '"Project name" should contain letters and number only';
-                    } break;
-                }
-            })
-            return errors;
-        })
-});
-
-// Schema for a post
-const postSchema = Joi.object({
-    _id: Joi.string()
-        .alphanum()
-        .label("_id")
-});
 /**
  * 
  * @param {*} req 
@@ -115,7 +115,7 @@ const postSchema = Joi.object({
  */
 module.exports.add = async (req) => {
     // validation
-    var { error, value } = await postAddSchema.validate(req.body);
+    var { error, value } = await Schema.post.validate(req.body);
     if (error) {
         // return with validation error message
         return {
@@ -152,7 +152,7 @@ module.exports.add = async (req) => {
  */
 module.exports.list = async (req) => {
     // validation
-    var { error, value } = await postListSchema.validate({ ...req.params, ...req.query });
+    var { error, value } = await Schema.list.validate({ ...req.params, ...req.query });
     if (error) {
         // return with validation error message
         return {
@@ -196,7 +196,7 @@ module.exports.list = async (req) => {
  */
 module.exports.get = async (req) => {
     // validation
-    var { error, value } = await postSchema.validate({ ...req.params });
+    var { error, value } = await Schema.get.validate({ ...req.params });
     if (error) {
         // return with validation error message
         return {
@@ -206,6 +206,7 @@ module.exports.get = async (req) => {
         }
     } else {
         let find = { user_id: req.user._id, _id: value._id };
+        console.log(find)
         //Get the documents
         let post = await Post.findOne(find);
         if (post) {
@@ -218,6 +219,54 @@ module.exports.get = async (req) => {
                 statusCode: 204
             }
         }
+
+    }
+}
+
+/**
+ * 
+ * @param {*} req 
+ * @description: This function updates a post
+ */
+module.exports.update = async (req) => {
+    // validation of parameters
+    var { error, value } = await Schema.get.validate(req.params);
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
+        let params = value;
+        // validation of body
+        var { error, value } = await Schema.post.validate(req.body);
+        if (error) {
+            // return with validation error message
+            return {
+                statusCode: 422,
+                message: error.message,
+                errorStack: error.details[0].path
+            }
+        } else {
+            let body = value;
+            let where = { user_id: req.user._id, _id: params._id };
+            //Get the documents
+            let post = await Post.updateOne(where, body, { runValidators: true });
+            if (post.nModified) {
+                return {
+                    statusCode: 202,
+                    message: "Post has been updated successfully."
+                }
+            } else {
+                return {
+                    statusCode: 200,
+                    message: "Trying to update same content."
+                }
+            }
+        }
+
 
     }
 }

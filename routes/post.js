@@ -34,4 +34,14 @@ router.get('/:_id', authentication, authorization.manager, async (req, res, next
         })
     }
 });
+router.patch('/:_id', authentication, authorization.manager, async (req, res, next) => {
+    try {
+        let response = await post.update(req);
+        res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
+    } catch (e) {
+        res.status(500).json({
+            messag: e.message
+        })
+    }
+});
 module.exports = router;
