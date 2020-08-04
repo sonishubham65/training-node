@@ -120,7 +120,6 @@ describe("Post API", () => {
         })
     })
     context('--List of post', () => {
-
         it("--authentication", (done) => {
             chai.request(server)
                 .get("/post/page/1").then((response) => {
