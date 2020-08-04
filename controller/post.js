@@ -76,7 +76,7 @@ const postAddSchema = Joi.object({
     status: Joi.any().allow('open', 'closed').label("Status").required(),
 });
 
-// Schema for a list page
+// Schema for a list post
 const postListSchema = Joi.object({
     page: Joi.number()
         .min(1)
@@ -102,7 +102,12 @@ const postListSchema = Joi.object({
         })
 });
 
-
+// Schema for a post
+const postSchema = Joi.object({
+    _id: Joi.string()
+        .alphanum()
+        .label("_id")
+});
 /**
  * 
  * @param {*} req 
@@ -182,5 +187,37 @@ module.exports.list = async (req) => {
                 count: count
             }
         }
+    }
+}
+/**
+ * 
+ * @param {*} req 
+ * @description: This function gets a post
+ */
+module.exports.get = async (req) => {
+    // validation
+    var { error, value } = await postSchema.validate({ ...req.params });
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
+        let find = { user_id: req.user._id, _id: value._id };
+        //Get the documents
+        let post = await Post.findOne(find);
+        if (post) {
+            return {
+                statusCode: 200,
+                data: post
+            }
+        } else {
+            return {
+                statusCode: 204
+            }
+        }
+
     }
 }
