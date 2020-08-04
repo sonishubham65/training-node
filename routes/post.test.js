@@ -3,10 +3,45 @@ let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 let server = require('../app');
 var expect = chai.expect;
-let ManagerToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjI2OGM1ZDBkYmJjNjM5YTQ3MjcxMDQiLCJpYXQiOjE1OTYzNjE4NTJ9.MlVwSUZeWBDJvpF0M-_D3VAlxB4Cz3_1VPtxcsmO9yI`;
-let EmployeeToken = `eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjI2OGNhZjZkNGI2ZDA0ZjQzMGI4ODUiLCJpYXQiOjE1OTY0NTc0NDJ9.s4xX-MBg6uSYOKIpPRMIG_Tfdir6dJl5YYdKVM5O8ho`;
+let ManagerToken;
+let EmployeeToken;
 describe("Post API", () => {
-    context('--add', () => {
+    before((done) => {
+        chai.request(server)
+            .post("/user/login").send({
+                "email": "manager@nagarro.com",
+                "password": "Pass@123",
+            }).then((response) => {
+                expect(response.statusCode).to.equal(200);
+                expect(response.body).to.contain.all.keys('data', 'token');
+                expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
+                expect(response.body.data.role).to.equal('manager');
+
+                ManagerToken = response.body.token;
+                done();
+            }).catch(err => {
+                console.log(err);
+            })
+
+    })
+    before((done) => {
+        chai.request(server)
+            .post("/user/login").send({
+                "email": "employee@nagarro.com",
+                "password": "Pass@123",
+            }).then((response) => {
+                expect(response.statusCode).to.equal(200);
+                expect(response.body).to.contain.all.keys('data', 'token');
+                expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
+                expect(response.body.data.role).to.equal('employee');
+
+                EmployeeToken = response.body.token;
+                done();
+            }).catch(err => {
+                console.log(err);
+            })
+    })
+    context('--add a post', () => {
         it("--authentication", (done) => {
             chai.request(server)
                 .post("/post/add").send({
@@ -62,7 +97,6 @@ describe("Post API", () => {
                     done(err)
                 })
         })
-
         it("Create a post", (done) => {
             chai.request(server)
                 .post("/post/add").send({
@@ -84,6 +118,32 @@ describe("Post API", () => {
                     done(err)
                 })
         })
+    })
+    context('--List of post', () => {
+
+        it("--authentication", (done) => {
+            chai.request(server)
+                .get("/post/page/1").then((response) => {
+                    expect(response.statusCode).to.equal(401);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("--authorization", (done) => {
+            chai.request(server)
+                .get("/post/page/1").set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                    expect(response.statusCode).to.equal(403);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
         it("List all post, with Project Name", (done) => {
             chai.request(server)
                 .get("/post/page/1?project_name=ging").set({ "Authorization": `Bearer ${ManagerToken}` })
@@ -108,7 +168,7 @@ describe("Post API", () => {
 
         it("List all post, with ID", (done) => {
             chai.request(server)
-                .get("/post/page/1?_id=5f28fa7d9dc60a5d4c0fa864").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .get("/post/page/1?_id=5f28013d718afc8b10693eb8").set({ "Authorization": `Bearer ${ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
@@ -136,6 +196,42 @@ describe("Post API", () => {
                     expect(response.body.data.count).to.be.a("number");
                     expect(response.body.data.posts).to.be.an("array");
                     expect(response.body.data.posts.length).to.be.equal(0);
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+    });
+
+    context('--Single Post', () => {
+        it("--authentication", (done) => {
+            chai.request(server)
+                .get("/post/5f28013d718afc8b10693eb8").then((response) => {
+                    expect(response.statusCode).to.equal(401);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("--authorization", (done) => {
+            chai.request(server)
+                .get("/post/5f28013d718afc8b10693eb8").set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                    expect(response.statusCode).to.equal(403);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("get a post", (done) => {
+            chai.request(server)
+                .get("/post/5f28013d718afc8b10693eb8").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body.data).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
                     done();
                 }).catch(err => {
                     done(err)

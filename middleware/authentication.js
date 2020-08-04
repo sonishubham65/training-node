@@ -8,24 +8,32 @@ module.exports = async (req, res, next) => {
             });
         } else {
             let token = req.headers.authorization.split(' ')[1];
-            let result = JWT.verify(token, process.env.JWT_passphrase);
-            if (result._id) {
-                let user = await User.findById(result._id);
-                if (user) {
-                    req.user = user;
-                    next();
+            if (token) {
+                let result = JWT.verify(token, process.env.JWT_passphrase);
+                if (result._id) {
+                    let user = await User.findById(result._id);
+                    if (user) {
+                        req.user = user;
+                        next();
+                    } else {
+                        res.status(401).json({
+                            message: "Invaid Payload."
+                        });
+                    }
                 } else {
                     res.status(401).json({
-                        message: "Invaid Payload."
+                        message: "Invaid token."
                     });
                 }
             } else {
                 res.status(401).json({
-                    message: "Invaid token."
+                    message: "JWT must be provided."
                 });
             }
+
         }
     } catch (e) {
+        console.log(e)
         res.status(500).json({
             messag: e.message
         })
