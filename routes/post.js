@@ -44,4 +44,14 @@ router.patch('/:_id', authentication, authorization.manager, async (req, res, ne
         })
     }
 });
+router.delete('/:_id', authentication, authorization.manager, async (req, res, next) => {
+    try {
+        let response = await post.delete(req);
+        res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
+    } catch (e) {
+        res.status(500).json({
+            messag: e.message
+        })
+    }
+});
 module.exports = router;

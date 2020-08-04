@@ -207,7 +207,7 @@ module.exports.get = async (req) => {
     } else {
         let find = { user_id: req.user._id, _id: value._id };
         console.log(find)
-        //Get the documents
+        //Get the document
         let post = await Post.findOne(find);
         if (post) {
             return {
@@ -252,9 +252,9 @@ module.exports.update = async (req) => {
         } else {
             let body = value;
             let where = { user_id: req.user._id, _id: params._id };
-            //Get the documents
-            let post = await Post.updateOne(where, body, { runValidators: true });
-            if (post.nModified) {
+            //update the document
+            let response = await Post.updateOne(where, body, { runValidators: true });
+            if (response.nModified) {
                 return {
                     statusCode: 202,
                     message: "Post has been updated successfully."
@@ -266,7 +266,38 @@ module.exports.update = async (req) => {
                 }
             }
         }
+    }
+}
+/**
+ * 
+ * @param {*} req 
+ * @description: This function updates a post
+ */
+module.exports.delete = async (req) => {
+    // validation of parameters
+    var { error, value } = await Schema.get.validate(req.params);
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
 
+        let where = { user_id: req.user._id, _id: value._id };
 
+        //delete the documents
+        let response = await Post.deleteOne(where);
+        if (response.deletedCount) {
+            return {
+                statusCode: 200,
+                message: "Post has been deleted successfully."
+            }
+        } else {
+            return {
+                statusCode: 204
+            }
+        }
     }
 }
