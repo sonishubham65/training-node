@@ -81,7 +81,25 @@ const postListSchema = Joi.object({
     page: Joi.number()
         .min(1)
         .label("Page")
-        .required()
+        .required(),
+    _id: Joi.string()
+        .alphanum()
+        .label("_id"),
+    project_name: Joi.string()
+        .min(3)
+        .max(60)
+        .label("Project name")
+        .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+        .error(errors => {
+            errors.forEach(error => {
+                switch (error.code) {
+                    case 'string.pattern.base': {
+                        error.message = '"Project name" should contain letters and number only';
+                    } break;
+                }
+            })
+            return errors;
+        })
 });
 
 
@@ -129,7 +147,7 @@ module.exports.add = async (req) => {
  */
 module.exports.list = async (req) => {
     // validation
-    var { error, value } = await postListSchema.validate(req.params);
+    var { error, value } = await postListSchema.validate({ ...req.params, ...req.query });
     if (error) {
         // return with validation error message
         return {
@@ -139,11 +157,22 @@ module.exports.list = async (req) => {
         }
     } else {
         let find = { user_id: req.user._id };
+        /**
+         * Filters for _id and project name
+         */
+        if (value._id) {
+            find._id = value._id;
+        }
+        if (value.project_name) {
+            find.project_name = { $regex: new RegExp(`.*${value.project_name}.*`), $options: "i" }
+        }
         let limit = 10;
         let skip = (value.page - 1) * limit;
-        let count = await Post.find(find).count();
-        let posts;
+        //Count the available documents
+        let count = await Post.find(find).countDocuments();
+        let posts = [];
         if (count) {
+            //Get the documents
             posts = await Post.find(find).skip(skip).limit(limit);
         }
         return {
