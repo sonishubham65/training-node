@@ -42,6 +42,9 @@ describe("Post API", () => {
                 console.log(err);
             })
     })
+    /**
+     * @description: All the test case when creating a new post
+     */
     context('--add a post', () => {
         it("--authentication", (done) => {
             chai.request(server)
@@ -122,6 +125,9 @@ describe("Post API", () => {
                 })
         })
     })
+    /**
+     * @description: All the test case when getting a list of post
+     */
     context('--List of post', () => {
         it("--authentication", (done) => {
             chai.request(server)
@@ -204,7 +210,9 @@ describe("Post API", () => {
                 })
         })
     });
-
+    /**
+     * @description: All the test case when getting a post
+     */
     context('--Get a Post', () => {
         it("--authentication", (done) => {
             chai.request(server)
@@ -240,7 +248,9 @@ describe("Post API", () => {
                 })
         })
     })
-
+    /**
+     * @description: All the test case when updating a post
+     */
     context('--update a post', () => {
         it("--authentication", (done) => {
             chai.request(server)
@@ -317,7 +327,9 @@ describe("Post API", () => {
                 })
         })
     })
-
+    /**
+     * @description: All the test case when deleting a post
+     */
     context('--Delete a Post', () => {
         it("--authentication", (done) => {
             chai.request(server)
@@ -362,5 +374,4 @@ describe("Post API", () => {
                 })
         })
     })
-
 })
