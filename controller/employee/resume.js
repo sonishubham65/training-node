@@ -1,4 +1,4 @@
-const User = require('../models/User');
+const User = require('../../models/User');
 const Joi = require('@hapi/joi');
 const Schema = {
     // Schema for a Post
@@ -22,7 +22,7 @@ const Schema = {
  * @description: This function put a resume for an employee
  */
 //const Formidable = require('formidable');
-module.exports.resume = async (req) => {
+module.exports.update = async (req) => {
     console.log(req.user._id)
     let response = await User.updateOne({
         _id: req.user._id,

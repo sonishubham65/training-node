@@ -1,13 +1,13 @@
 var express = require('express');
 var router = express.Router();
 
-const employee = require('../../controller/employee');
+const resume = require('../../controller/employee/resume');
 
 const path = require("path")
 var multer = require('multer');
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '../public/resumes'))
+        cb(null, path.join(__dirname, '../../public/resumes'))
     },
 
     filename: function (req, file, cb) {
@@ -26,7 +26,7 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage, limits: { fileSize: 1000000 } }).single('resume')
 
-router.put('/resume', async (req, res, next) => {
+router.put('/', async (req, res, next) => {
     try {
         let response = await new Promise((resolve, reject) => {
             upload(req, res, async (err) => {
@@ -44,7 +44,7 @@ router.put('/resume', async (req, res, next) => {
                     });
                 } else {
                     if (req.file) {
-                        let response = await employee.resume(req);
+                        let response = await resume.update(req);
                         resolve({ statusCode: response.statusCode, message: response.message, data: response.data });
                     } else {
                         resolve({
