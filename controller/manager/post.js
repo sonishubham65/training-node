@@ -1,4 +1,4 @@
-const Post = require('../models/Post');
+const Post = require('../../models/manager/Post');
 const Joi = require('@hapi/joi');
 const Schema = {
     // Schema for a Post
@@ -254,15 +254,21 @@ module.exports.update = async (req) => {
             let where = { user_id: req.user._id, _id: params._id };
             //update the document
             let response = await Post.updateOne(where, body, { runValidators: true });
-            if (response.nModified) {
-                return {
-                    statusCode: 202,
-                    message: "Post has been updated successfully."
+            if (response.n > 0) {
+                if (response.nModified) {
+                    return {
+                        statusCode: 202,
+                        message: "Post has been updated successfully."
+                    }
+                } else {
+                    return {
+                        statusCode: 200,
+                        message: "Trying to update same content."
+                    }
                 }
             } else {
                 return {
-                    statusCode: 200,
-                    message: "Trying to update same content."
+                    statusCode: 204
                 }
             }
         }
