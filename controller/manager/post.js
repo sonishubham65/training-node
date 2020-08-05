@@ -206,7 +206,6 @@ module.exports.get = async (req) => {
         }
     } else {
         let find = { user_id: req.user._id, _id: value._id };
-        console.log(find)
         //Get the document
         let post = await Post.findOne(find);
         if (post) {
