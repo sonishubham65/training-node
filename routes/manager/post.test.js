@@ -1,7 +1,7 @@
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
-let server = require('../app');
+let server = require('../../app');
 var expect = chai.expect;
 let ManagerToken;
 let EmployeeToken;
@@ -48,7 +48,7 @@ describe("Post API", () => {
     context('--add a post', () => {
         it("--authentication", (done) => {
             chai.request(server)
-                .post("/post").send({
+                .post("/manager/post").send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": [""],
@@ -66,7 +66,7 @@ describe("Post API", () => {
         })
         it("--authorization", (done) => {
             chai.request(server)
-                .post("/post/").send({
+                .post("/manager/post/").send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": ["PHP"],
@@ -84,7 +84,7 @@ describe("Post API", () => {
         })
         it("--validation", (done) => {
             chai.request(server)
-                .post("/post").set({ "Authorization": `Bearer ${ManagerToken}` }).send({
+                .post("/manager/post").set({ "Authorization": `Bearer ${ManagerToken}` }).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": [""],
@@ -103,7 +103,7 @@ describe("Post API", () => {
         })
         it("Create a post", (done) => {
             chai.request(server)
-                .post("/post").send({
+                .post("/manager/post").send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": ["PHP"],
@@ -131,7 +131,7 @@ describe("Post API", () => {
     context('--List of post', () => {
         it("--authentication", (done) => {
             chai.request(server)
-                .get("/post/page/1").then((response) => {
+                .get("/manager/post/page/1").then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -142,7 +142,7 @@ describe("Post API", () => {
         })
         it("--authorization", (done) => {
             chai.request(server)
-                .get("/post/page/1").set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                .get("/manager/post/page/1").set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -154,7 +154,7 @@ describe("Post API", () => {
 
         it("List all post, with Project Name", (done) => {
             chai.request(server)
-                .get("/post/page/1?project_name=ging").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .get("/manager/post/page/1?project_name=ging").set({ "Authorization": `Bearer ${ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
@@ -176,7 +176,7 @@ describe("Post API", () => {
 
         it("List all post, with ID", (done) => {
             chai.request(server)
-                .get("/post/page/1?_id=5f28013d718afc8b10693eb8").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .get("/manager/post/page/1?_id=5f28013d718afc8b10693eb8").set({ "Authorization": `Bearer ${ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
@@ -196,7 +196,7 @@ describe("Post API", () => {
 
         it("List all post, page count exceed limit", (done) => {
             chai.request(server)
-                .get("/post/page/1000000").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .get("/manager/post/page/1000000").set({ "Authorization": `Bearer ${ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
@@ -216,7 +216,7 @@ describe("Post API", () => {
     context('--Get a Post', () => {
         it("--authentication", (done) => {
             chai.request(server)
-                .get(`/post/${postId}`).then((response) => {
+                .get(`/manager/post/${postId}`).then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -227,7 +227,7 @@ describe("Post API", () => {
         })
         it("--authorization", (done) => {
             chai.request(server)
-                .get(`/post/${postId}`).set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                .get(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -238,7 +238,7 @@ describe("Post API", () => {
         })
         it("get a post", (done) => {
             chai.request(server)
-                .get(`/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
+                .get(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body.data).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
@@ -254,7 +254,7 @@ describe("Post API", () => {
     context('--update a post', () => {
         it("--authentication", (done) => {
             chai.request(server)
-                .patch(`/post/${postId}`).send({
+                .patch(`/manager/post/${postId}`).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": [""],
@@ -272,7 +272,7 @@ describe("Post API", () => {
         })
         it("--authorization", (done) => {
             chai.request(server)
-                .patch(`/post/${postId}`).send({
+                .patch(`/manager/post/${postId}`).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": ["PHP"],
@@ -290,7 +290,7 @@ describe("Post API", () => {
         })
         it("--validation", (done) => {
             chai.request(server)
-                .patch(`/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` }).send({
+                .patch(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` }).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": [""],
@@ -309,7 +309,7 @@ describe("Post API", () => {
         })
         it("update a post", (done) => {
             chai.request(server)
-                .patch(`/post/${postId}`).send({
+                .patch(`/manager/post/${postId}`).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarrxo",
                     "technologies": ["PHP"],
@@ -333,7 +333,7 @@ describe("Post API", () => {
     context('--Delete a Post', () => {
         it("--authentication", (done) => {
             chai.request(server)
-                .delete(`/post/${postId}`).then((response) => {
+                .delete(`/manager/post/${postId}`).then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -344,7 +344,7 @@ describe("Post API", () => {
         })
         it("--authorization", (done) => {
             chai.request(server)
-                .delete(`/post/${postId}`).set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                .delete(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -355,7 +355,7 @@ describe("Post API", () => {
         })
         it("delete a post", (done) => {
             chai.request(server)
-                .delete(`/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
+                .delete(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     done();
@@ -365,7 +365,7 @@ describe("Post API", () => {
         })
         it("delete a post again", (done) => {
             chai.request(server)
-                .delete(`/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
+                .delete(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(204);
                     done();
