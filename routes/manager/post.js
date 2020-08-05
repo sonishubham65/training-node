@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 
-const post = require('../controller/post');
-const authentication = require('../middleware/authentication');
-const authorization = require('../middleware/authorization');
+const post = require('../../controller/manager/post');
+const authentication = require('../../middleware/authentication');
+const authorization = require('../../middleware/authorization');
 router.post('/', authentication, authorization.manager, async (req, res, next) => {
     try {
         let response = await post.add(req);
