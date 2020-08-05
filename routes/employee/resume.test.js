@@ -7,7 +7,7 @@ var expect = chai.expect;
 const fs = require('fs');
 let EmployeeToken;
 let ManagerToken;
-describe("Resume API", () => {
+describe("************Resume API********************", () => {
     before((done) => {
         chai.request(server)
             .post("/user/login").send({
@@ -94,7 +94,6 @@ describe("Resume API", () => {
                 .set('Content-Type', 'multipart/form-data')
                 .set({ "Authorization": `Bearer ${EmployeeToken}` })
                 .attach('resume', correctFile, 'Shubham Nagarro Resume.docx').then((response) => {
-                    console.log(response.body)
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");

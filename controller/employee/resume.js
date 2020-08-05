@@ -23,7 +23,6 @@ const Schema = {
  */
 //const Formidable = require('formidable');
 module.exports.update = async (req) => {
-    console.log(req.user._id)
     let response = await User.updateOne({
         _id: req.user._id,
     }, {
