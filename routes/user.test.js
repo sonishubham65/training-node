@@ -2,7 +2,6 @@ let chai = require('chai');
 let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 let server = require('../app');
-const { response } = require('../app');
 var expect = chai.expect;
 var uniqid = require('uniqid');
 describe("User API", () => {
