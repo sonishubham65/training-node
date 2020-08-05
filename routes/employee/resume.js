@@ -1,9 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const employee = require('../controller/employee');
-const authentication = require('../middleware/authentication');
-const authorization = require('../middleware/authorization');
+const employee = require('../../controller/employee');
 
 const path = require("path")
 var multer = require('multer');
@@ -28,7 +26,7 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage, limits: { fileSize: 1000000 } }).single('resume')
 
-router.put('/resume', authentication, authorization.employee, async (req, res, next) => {
+router.put('/resume', async (req, res, next) => {
     try {
         let response = await new Promise((resolve, reject) => {
             upload(req, res, async (err) => {
