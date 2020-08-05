@@ -15,6 +15,8 @@ var userSchema = new Schema({
         default: 'employee'
     },
     created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date },
+    resume: Object,
     login_at: { type: Date }
 });
 

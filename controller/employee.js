@@ -1,4 +1,4 @@
-const Resume = require('../models/Resume');
+const User = require('../models/User');
 const Joi = require('@hapi/joi');
 const Schema = {
     // Schema for a Post
@@ -23,20 +23,29 @@ const Schema = {
  */
 //const Formidable = require('formidable');
 module.exports.resume = async (req) => {
-    let response = await Resume.updateOne({
-        user_id: req.user._id,
+    console.log(req.user._id)
+    let response = await User.updateOne({
+        _id: req.user._id,
     }, {
-        originalname: req.file.originalname,
-        filename: req.file.filename,
-        size: req.file.size,
-    }, {
-        new: true,
-        upsert: true // Make this update into an upsert
-    });
+        resume: {
+            originalname: req.file.originalname,
+            filename: req.file.filename,
+            size: req.file.size,
+            updated_at: new Date()
+        }
+    }, { runValidators: true });
 
     // return successfully
-    return {
-        statusCode: 201,
-        message: response.nModified ? "The resume has been updated successully." : "The resume has been inserted successully."
+    if (response.nModified) {
+        return {
+            statusCode: 200,
+            message: "The resume has been updated successully."
+        }
+    } else {
+        return {
+            statusCode: 500,
+            message: "Unknown error"
+        }
     }
+
 }

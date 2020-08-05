@@ -256,7 +256,7 @@ module.exports.update = async (req) => {
             let response = await Post.updateOne(where, body, { runValidators: true });
             if (response.nModified) {
                 return {
-                    statusCode: 202,
+                    statusCode: 200,
                     message: "Post has been updated successfully."
                 }
             } else {
