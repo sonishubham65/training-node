@@ -181,8 +181,13 @@ describe("********************Position API********************", () => {
                     expect(response.body.data).to.be.an("object");
                     expect(response.body.data).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
                     expect(response.body.data.technologies).to.be.an('array');
-                    expect(response.body.data.user_id).to.be.an('object');
-                    expect(response.body.data.user_id).to.contain.all.keys("name", 'email');
+                    expect(response.body.data.user).to.be.an('object');
+                    if (response.body.data.application) {
+                        expect(response.body.data.application).to.be.an('object');
+                        expect(response.body.data.user).to.contain.all.keys("name", 'email');
+                        expect(response.body.data.application).to.contain.all.keys("name", 'email');
+                    }
+
                     done();
                 }).catch(err => {
                     done(err)
