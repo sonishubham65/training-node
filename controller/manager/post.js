@@ -1,4 +1,4 @@
-const Post = require('../../models/manager/Post');
+const Post = require('../../models/Post');
 const Joi = require('@hapi/joi');
 const Schema = {
     // Schema for a Post
@@ -55,7 +55,7 @@ const Schema = {
         )
             .label("Technologies")
             .required(),
-        role: Joi.any().allow('trainee', 'associate', 'senior_associate', 'lead', 'manager', 'director').label("Role").required(),
+        role: Joi.any().valid('trainee', 'associate', 'senior_associate', 'lead', 'manager', 'director').label("Role").required(),
         description: Joi.string()
             .min(100)
             .max(1000)
@@ -184,14 +184,14 @@ module.exports.list = async (req) => {
             statusCode: 200,
             data: {
                 posts: posts,
-                count: count
+                totalPages: Math.ceil(count / limit)
             }
         }
     }
 }
 /**
  * 
- * @param {*} req 
+ * @param {*} req
  * @description: This function gets a post
  */
 module.exports.get = async (req) => {
