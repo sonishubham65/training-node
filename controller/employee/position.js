@@ -1,3 +1,5 @@
+var mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 const Post = require('../../models/Post');
 const Application = require('../../models/Application');
 const Joi = require('@hapi/joi');
@@ -94,12 +96,43 @@ module.exports.get = async (req) => {
             errorStack: error.details[0].path
         }
     } else {
-        let find = { _id: value._id, status: "open" };
-        //Get the document with user data
-        let post = await Post.findOne(find).populate({
-            path: 'user_id',
-            select: ["name", "email"]
-        });
+        let post = await Post.aggregate([
+            { $match: { _id: ObjectId(value._id), status: "open" } },
+            {
+                $lookup: {
+                    from: "applications",
+                    let: { id: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                status: "applied",
+                                user_id: ObjectId(req.user._id),
+                                $expr: {
+                                    $eq: ["$post_id", { $toObjectId: "$$id" }]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'application',
+                },
+
+            }, {
+                $lookup: {
+                    from: "users",
+                    let: { userid: "$user_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", { $toObjectId: "$$userid" }]
+                                }
+                            }
+                        }
+                    ],
+                    as: 'user',
+                }
+            }
+        ])
         if (post) {
             return {
                 statusCode: 200,
@@ -139,7 +172,7 @@ module.exports.apply = async (req) => {
                 message: "You have already applied for this position."
             }
         } else {
-            let application = await Application.create({ post_id: value._id, user_id: req.user.id });
+            let application = await Application.create({ post_id: value._id, user_id: req.user.id, status: 'applied' });
             if (application._id) {
                 return {
                     statusCode: 201,
