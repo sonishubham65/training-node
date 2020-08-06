@@ -1,4 +1,5 @@
 const Post = require('../../models/Post');
+const Application = require('../../models/Application');
 const Joi = require('@hapi/joi');
 const Schema = {
     // Schema for a list post
@@ -103,6 +104,37 @@ module.exports.get = async (req) => {
             return {
                 statusCode: 200,
                 data: post
+            }
+        } else {
+            return {
+                statusCode: 204
+            }
+        }
+    }
+}
+
+
+/**
+ * 
+ * @param {*} req 
+ * @description: This function applies a post
+ */
+module.exports.apply = async (req) => {
+    // validation
+    var { error, value } = await Schema.get.validate({ ...req.params });
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
+        //Insert the application
+        let application = await Application.create({ post_id: value._id, user_id: req.user.id });
+        if (application) {
+            return {
+                statusCode: 201
             }
         } else {
             return {

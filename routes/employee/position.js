@@ -23,4 +23,15 @@ router.get('/:_id', async (req, res, next) => {
         })
     }
 });
+//Position apply route
+router.post('/:_id', async (req, res, next) => {
+    try {
+        let response = await position.apply(req);
+        res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
+    } catch (e) {
+        res.status(500).json({
+            messag: e.message
+        })
+    }
+});
 module.exports = router;
