@@ -131,15 +131,26 @@ module.exports.apply = async (req) => {
         }
     } else {
         //Insert the application
-        let application = await Application.create({ post_id: value._id, user_id: req.user.id });
+        let application = await Application.findOne({ post_id: value._id, user_id: req.user.id });
+        console.log(application)
         if (application) {
             return {
-                statusCode: 201
+                statusCode: 409,
+                message: "You have already applied for this position."
             }
         } else {
-            return {
-                statusCode: 204
+            let application = await Application.create({ post_id: value._id, user_id: req.user.id });
+            if (application._id) {
+                return {
+                    statusCode: 201,
+                    message: "Thank you for applying on this position."
+                }
+            } else {
+                return {
+                    statusCode: 204
+                }
             }
         }
+
     }
 }
