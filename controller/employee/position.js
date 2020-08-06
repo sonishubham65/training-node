@@ -80,6 +80,7 @@ module.exports.list = async (req) => {
         }
     }
 }
+
 /**
  * 
  * @param {*} req 
@@ -111,6 +112,12 @@ module.exports.get = async (req) => {
                                     $eq: ["$post_id", { $toObjectId: "$$id" }]
                                 }
                             }
+                        },
+                        {
+                            $project: {
+                                status: 1,
+                                created_at: 1
+                            }
                         }
                     ],
                     as: 'application',
@@ -127,13 +134,31 @@ module.exports.get = async (req) => {
                                     $eq: ["$_id", { $toObjectId: "$$userid" }]
                                 }
                             }
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                email: 1
+                            }
                         }
                     ],
                     as: 'user',
-                }
+                },
+
             }
         ])
-        if (post) {
+        if (post.length) {
+            post = post[0];
+            if (post.application.length) {
+                post.application = post.application[0];
+            } else {
+                delete post.application;
+            }
+            if (post.user.length) {
+                post.user = post.user[0];
+            } else {
+                delete post.user;
+            }
             return {
                 statusCode: 200,
                 data: post
