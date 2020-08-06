@@ -189,4 +189,43 @@ describe("********************Position API********************", () => {
                 })
         })
     })
+    /**
+     * @description: Apply for the position
+     */
+    context('--Apply position', () => {
+        it("--authentication", (done) => {
+            chai.request(server)
+                .post(`/employee/position/apply/${postId}`).then((response) => {
+                    expect(response.statusCode).to.equal(401);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("--authorization", (done) => {
+            chai.request(server)
+                .post(`/employee/position/apply/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` }).then((response) => {
+                    expect(response.statusCode).to.equal(403);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("apply Positions", (done) => {
+            chai.request(server)
+                .post(`/employee/position/apply/${postId}`).set({ "Authorization": `Bearer ${EmployeeToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(201);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+    })
 })
