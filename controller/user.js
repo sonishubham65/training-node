@@ -41,7 +41,7 @@ const signupSchema = Joi.object({
         .required()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
         .label("Email"),
-    role: Joi.any().allow('employee', 'manager').label("Role").required()
+    role: Joi.any().valid('employee', 'manager').label("Role").required()
 });
 
 
