@@ -1,21 +1,5 @@
 const User = require('../../models/User');
 const Joi = require('@hapi/joi');
-const Schema = {
-    // Schema for a Post
-    upload_resume: Joi.object({
-        _id: Joi.string()
-            .alphanum()
-            .label("_id")
-            .required()
-    }),
-    // Schema for downloading a resume
-    download_resume: Joi.object({
-        _id: Joi.string()
-            .alphanum()
-            .label("_id")
-    })
-}
-
 /**
  * 
  * @param {*} req 
@@ -46,5 +30,4 @@ module.exports.update = async (req) => {
             message: "Unknown error"
         }
     }
-
 }
