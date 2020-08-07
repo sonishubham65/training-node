@@ -104,3 +104,4 @@ dist
 .tern-port
 
 public/resumes/*
+test-cases/config.json
