@@ -3,59 +3,17 @@ let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 let server = require('../../app');
 var expect = chai.expect;
-let ManagerToken;
-let EmployeeToken;
-let postId;
-describe("********************Post API********************", () => {
-    before((done) => {
-        chai.request(server)
-            .post("/user/login").send({
-                "email": "manager@nagarro.com",
-                "password": "Pass@123",
-            }).then((response) => {
-                expect(response.statusCode).to.equal(200);
-                expect(response.body).to.contain.all.keys('data', 'token');
-                expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
-                expect(response.body.data.role).to.equal('manager');
 
-                ManagerToken = response.body.token;
-                done();
-            }).catch(err => {
-                console.log(err);
-            })
+const fs = require('fs');
+const path = require('path');
 
-    })
-    before((done) => {
-        chai.request(server)
-            .post("/user/login").send({
-                "email": "employee@nagarro.com",
-                "password": "Pass@123",
-            }).then((response) => {
-                expect(response.statusCode).to.equal(200);
-                expect(response.body).to.contain.all.keys('data', 'token');
-                expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
-                expect(response.body.data.role).to.equal('employee');
+describe("Manager, Post Crud operations API", () => {
+    const config = require('../config');
 
-                EmployeeToken = response.body.token;
-                done();
-            }).catch(err => {
-                console.log(err);
-            })
-    })
-    /**
-     * @description: All the test case when creating a new post
-     */
-    context('--add a post', () => {
-        it("--authentication", (done) => {
+    context('Post Add:', () => {
+        it("1. Authentication", (done) => {
             chai.request(server)
-                .post("/manager/post").send({
-                    "project_name": "Ginger",
-                    "client_name": "Nagarro",
-                    "technologies": [""],
-                    "role": "trainee",
-                    "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
-                    "status": "open"
-                }).then((response) => {
+                .post("/manager/post").send({}).then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -64,16 +22,9 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("--authorization", (done) => {
+        it("2. Authorization", (done) => {
             chai.request(server)
-                .post("/manager/post/").send({
-                    "project_name": "Ginger",
-                    "client_name": "Nagarro",
-                    "technologies": ["PHP"],
-                    "role": "trainee",
-                    "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
-                    "status": "open"
-                }).set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                .post("/manager/post/").send({}).set({ "Authorization": `Bearer ${config.EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -82,9 +33,9 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("--validation", (done) => {
+        it("3. Validation", (done) => {
             chai.request(server)
-                .post("/manager/post").set({ "Authorization": `Bearer ${ManagerToken}` }).send({
+                .post("/manager/post").set({ "Authorization": `Bearer ${config.ManagerToken}` }).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": [""],
@@ -101,7 +52,7 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("Create a post", (done) => {
+        it("4. Add", (done) => {
             chai.request(server)
                 .post("/manager/post").send({
                     "project_name": "Ginger",
@@ -110,14 +61,39 @@ describe("********************Post API********************", () => {
                     "role": "trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
                     "status": "open"
-                }).set({ "Authorization": `Bearer ${ManagerToken}` })
+                }).set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(201);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
                     expect(response.body.data).to.be.an("object");
                     expect(response.body.data._id).to.be.a("string");
-
+                    config.postId = response.body.data._id;
+                    /**
+                     * update configs
+                     */
+                    fs.writeFileSync(path.join(__dirname, '../config.json'), JSON.stringify(config));
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("5. Add second post for delete", (done) => {
+            chai.request(server)
+                .post("/manager/post").send({
+                    "project_name": "Ginger",
+                    "client_name": "Nagarro",
+                    "technologies": ["PHP"],
+                    "role": "trainee",
+                    "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
+                    "status": "open"
+                }).set({ "Authorization": `Bearer ${config.ManagerToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(201);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    expect(response.body.data).to.be.an("object");
+                    expect(response.body.data._id).to.be.a("string");
                     postId = response.body.data._id;
                     done();
                 }).catch(err => {
@@ -125,11 +101,10 @@ describe("********************Post API********************", () => {
                 })
         })
     })
-    /**
-     * @description: All the test case when getting a list of post
-     */
-    context('--List of post', () => {
-        it("--authentication", (done) => {
+
+
+    context('Post List:', () => {
+        it("1. Authentication", (done) => {
             chai.request(server)
                 .get("/manager/post/page/1").then((response) => {
                     expect(response.statusCode).to.equal(401);
@@ -140,9 +115,9 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("--authorization", (done) => {
+        it("2. Authorization", (done) => {
             chai.request(server)
-                .get("/manager/post/page/1").set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                .get("/manager/post/page/1").set({ "Authorization": `Bearer ${config.EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -152,9 +127,9 @@ describe("********************Post API********************", () => {
                 })
         })
 
-        it("List all post, with Project Name", (done) => {
+        it("3. Post List, with Project Name", (done) => {
             chai.request(server)
-                .get("/manager/post/page/1?project_name=ging").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .get("/manager/post/page/1?project_name=ging").set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
@@ -174,9 +149,9 @@ describe("********************Post API********************", () => {
                 })
         })
 
-        it("List all post, with ID", (done) => {
+        it("Post List, with ID", (done) => {
             chai.request(server)
-                .get("/manager/post/page/1?_id=5f28013d718afc8b10693eb8").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .get("/manager/post/page/1?_id=5f28013d718afc8b10693eb8").set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
@@ -194,9 +169,9 @@ describe("********************Post API********************", () => {
                 })
         })
 
-        it("List all post, page count exceed limit", (done) => {
+        it("Post List, with page count exceed limit", (done) => {
             chai.request(server)
-                .get("/manager/post/page/1000000").set({ "Authorization": `Bearer ${ManagerToken}` })
+                .get("/manager/post/page/1000000").set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
@@ -213,10 +188,10 @@ describe("********************Post API********************", () => {
     /**
      * @description: All the test case when getting a post
      */
-    context('--Get a Post', () => {
-        it("--authentication", (done) => {
+    context('Post Get:', () => {
+        it("1. Authentication", (done) => {
             chai.request(server)
-                .get(`/manager/post/${postId}`).then((response) => {
+                .get(`/manager/post/${config.postId}`).then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -225,9 +200,9 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("--authorization", (done) => {
+        it("2. authorization", (done) => {
             chai.request(server)
-                .get(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                .get(`/manager/post/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -236,9 +211,9 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("get a post", (done) => {
+        it("3. Post get", (done) => {
             chai.request(server)
-                .get(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
+                .get(`/manager/post/${config.postId}`).set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body.data).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
@@ -251,10 +226,10 @@ describe("********************Post API********************", () => {
     /**
      * @description: All the test case when updating a post
      */
-    context('--update a post', () => {
-        it("--authentication", (done) => {
+    context('Post update:', () => {
+        it("1. Authentication", (done) => {
             chai.request(server)
-                .patch(`/manager/post/${postId}`).send({
+                .patch(`/manager/post/${config.postId}`).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": [""],
@@ -270,16 +245,16 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("--authorization", (done) => {
+        it("2. Authorization", (done) => {
             chai.request(server)
-                .patch(`/manager/post/${postId}`).send({
+                .patch(`/manager/post/${config.postId}`).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": ["PHP"],
                     "role": "trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
                     "status": "open"
-                }).set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                }).set({ "Authorization": `Bearer ${config.EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -288,9 +263,9 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("--validation", (done) => {
+        it("3. Validation", (done) => {
             chai.request(server)
-                .patch(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` }).send({
+                .patch(`/manager/post/${config.postId}`).set({ "Authorization": `Bearer ${config.ManagerToken}` }).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": [""],
@@ -307,16 +282,16 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("update a post", (done) => {
+        it("4. Post update", (done) => {
             chai.request(server)
-                .patch(`/manager/post/${postId}`).send({
+                .patch(`/manager/post/${config.postId}`).send({
                     "project_name": "Ginger",
                     "client_name": "Nagarrxo",
                     "technologies": ["PHP"],
                     "role": "trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
                     "status": "open"
-                }).set({ "Authorization": `Bearer ${ManagerToken}` })
+                }).set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(202);
                     expect(response.body).to.be.an('object').that.has.property('message');
@@ -330,8 +305,8 @@ describe("********************Post API********************", () => {
     /**
      * @description: All the test case when deleting a post
      */
-    context('--Delete a Post', () => {
-        it("--authentication", (done) => {
+    context('Post delete:', () => {
+        it("1. Authentication", (done) => {
             chai.request(server)
                 .delete(`/manager/post/${postId}`).then((response) => {
                     expect(response.statusCode).to.equal(401);
@@ -342,9 +317,9 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("--authorization", (done) => {
+        it("2. Authorization", (done) => {
             chai.request(server)
-                .delete(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${EmployeeToken}` }).then((response) => {
+                .delete(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -353,9 +328,9 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("delete a post", (done) => {
+        it("3. Post Delete", (done) => {
             chai.request(server)
-                .delete(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
+                .delete(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     done();
@@ -363,9 +338,9 @@ describe("********************Post API********************", () => {
                     done(err)
                 })
         })
-        it("delete a post again", (done) => {
+        it("4. Post delete again", (done) => {
             chai.request(server)
-                .delete(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${ManagerToken}` })
+                .delete(`/manager/post/${postId}`).set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(204);
                     done();

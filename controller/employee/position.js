@@ -1,4 +1,7 @@
+var mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 const Post = require('../../models/Post');
+const Application = require('../../models/Application');
 const Joi = require('@hapi/joi');
 const Schema = {
     // Schema for a list post
@@ -77,6 +80,7 @@ module.exports.list = async (req) => {
         }
     }
 }
+
 /**
  * 
  * @param {*} req 
@@ -93,13 +97,68 @@ module.exports.get = async (req) => {
             errorStack: error.details[0].path
         }
     } else {
-        let find = { _id: value._id, status: "open" };
-        //Get the document with user data
-        let post = await Post.findOne(find).populate({
-            path: 'user_id',
-            select: ["name", "email"]
-        });
-        if (post) {
+        let post = await Post.aggregate([
+            { $match: { _id: ObjectId(value._id), status: "open" } },
+            {
+                $lookup: {
+                    from: "applications",
+                    let: { id: "$_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                status: "applied",
+                                user_id: ObjectId(req.user._id),
+                                $expr: {
+                                    $eq: ["$post_id", { $toObjectId: "$$id" }]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                status: 1,
+                                created_at: 1
+                            }
+                        }
+                    ],
+                    as: 'application',
+                },
+
+            }, {
+                $lookup: {
+                    from: "users",
+                    let: { userid: "$user_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $expr: {
+                                    $eq: ["$_id", { $toObjectId: "$$userid" }]
+                                }
+                            }
+                        },
+                        {
+                            $project: {
+                                name: 1,
+                                email: 1
+                            }
+                        }
+                    ],
+                    as: 'user',
+                },
+
+            }
+        ])
+        if (post.length) {
+            post = post[0];
+            if (post.application.length) {
+                post.application = post.application[0];
+            } else {
+                delete post.application;
+            }
+            if (post.user.length) {
+                post.user = post.user[0];
+            } else {
+                delete post.user;
+            }
             return {
                 statusCode: 200,
                 data: post
@@ -109,5 +168,46 @@ module.exports.get = async (req) => {
                 statusCode: 204
             }
         }
+    }
+}
+
+
+/**
+ * 
+ * @param {*} req 
+ * @description: This function applies a post
+ */
+module.exports.apply = async (req) => {
+    // validation
+    var { error, value } = await Schema.get.validate({ ...req.params });
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
+        //Insert the application
+        let application = await Application.findOne({ post_id: value._id, user_id: req.user.id });
+        if (application) {
+            return {
+                statusCode: 409,
+                message: "You have already applied for this position."
+            }
+        } else {
+            let application = await Application.create({ post_id: value._id, user_id: req.user.id, status: 'applied' });
+            if (application._id) {
+                return {
+                    statusCode: 201,
+                    message: "Thank you for applying on this position."
+                }
+            } else {
+                return {
+                    statusCode: 204
+                }
+            }
+        }
+
     }
 }

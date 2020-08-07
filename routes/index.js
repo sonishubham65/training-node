@@ -1,9 +1,8 @@
 var express = require('express');
 var router = express.Router();
 
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Express' });
-});
+const authentication = require('../middleware/authentication');
+var position = require('./position')
+router.use('/position', authentication, position);
 
 module.exports = router;
