@@ -14,7 +14,7 @@ describe("Employee Position API", () => {
     context('Positions List:', () => {
         it("1. Authentication", (done) => {
             chai.request(server)
-                .get("/employee/position/page/1").then((response) => {
+                .get("/position/page/1").then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -23,20 +23,10 @@ describe("Employee Position API", () => {
                     done(err)
                 })
         })
-        it("2. Authorization", (done) => {
+
+        it("2. Validation", (done) => {
             chai.request(server)
-                .get("/employee/position/page/1").set({ "Authorization": `Bearer ${config.ManagerToken}` }).then((response) => {
-                    expect(response.statusCode).to.equal(403);
-                    expect(response.body).to.be.an('object').that.has.property('message');
-                    expect(response.body.message).to.be.a("string");
-                    done();
-                }).catch(err => {
-                    done(err)
-                })
-        })
-        it("3. Validation", (done) => {
-            chai.request(server)
-                .get("/employee/position/page/0").set({ "Authorization": `Bearer ${config.EmployeeToken}` }).then((response) => {
+                .get("/position/page/0").set({ "Authorization": `Bearer ${config.EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(422);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -47,9 +37,9 @@ describe("Employee Position API", () => {
                 })
         })
 
-        it("4. Positions List", (done) => {
+        it("3. Positions List", (done) => {
             chai.request(server)
-                .get("/employee/position/page/1").set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .get("/position/page/1").set({ "Authorization": `Bearer ${config.EmployeeToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).that.has.property("data");
@@ -72,7 +62,7 @@ describe("Employee Position API", () => {
     context('Single Position:', () => {
         it("1. Authentication", (done) => {
             chai.request(server)
-                .get(`/employee/position/${config.postId}`).then((response) => {
+                .get(`/position/${config.postId}`).then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -81,20 +71,10 @@ describe("Employee Position API", () => {
                     done(err)
                 })
         })
-        it("2. Authorization", (done) => {
+
+        it("2. Position Get", (done) => {
             chai.request(server)
-                .get(`/employee/position/${config.postId}`).set({ "Authorization": `Bearer ${config.ManagerToken}` }).then((response) => {
-                    expect(response.statusCode).to.equal(403);
-                    expect(response.body).to.be.an('object').that.has.property('message');
-                    expect(response.body.message).to.be.a("string");
-                    done();
-                }).catch(err => {
-                    done(err)
-                })
-        })
-        it("3. Position Get", (done) => {
-            chai.request(server)
-                .get(`/employee/position/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .get(`/position/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).that.has.property("data");
@@ -118,7 +98,7 @@ describe("Employee Position API", () => {
     context('Position Apply:', () => {
         it("1. Authentication", (done) => {
             chai.request(server)
-                .post(`/employee/position/apply/${config.postId}`).then((response) => {
+                .post(`/position/apply/${config.postId}`).then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -129,7 +109,7 @@ describe("Employee Position API", () => {
         })
         it("2. Authorization", (done) => {
             chai.request(server)
-                .post(`/employee/position/apply/${config.postId}`).set({ "Authorization": `Bearer ${config.ManagerToken}` }).then((response) => {
+                .post(`/position/apply/${config.postId}`).set({ "Authorization": `Bearer ${config.ManagerToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
@@ -140,7 +120,7 @@ describe("Employee Position API", () => {
         })
         it("3. Positions Apply", (done) => {
             chai.request(server)
-                .post(`/employee/position/apply/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .post(`/position/apply/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(201);
                     expect(response.body).to.be.an('object').that.has.property('message');
@@ -152,7 +132,7 @@ describe("Employee Position API", () => {
         })
         it("4. Position Get After Apply", (done) => {
             chai.request(server)
-                .get(`/employee/position/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .get(`/position/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).that.has.property("data");
