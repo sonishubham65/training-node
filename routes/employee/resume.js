@@ -65,4 +65,54 @@ router.put('/', async (req, res, next) => {
         })
     }
 });
+router.put('/', async (req, res, next) => {
+    try {
+        let response = await new Promise((resolve, reject) => {
+            upload(req, res, async (err) => {
+                if (err instanceof multer.MulterError) {
+                    resolve({
+                        statusCode: 422,
+                        message: err.message,
+                        errorStack: [err.field]
+                    });
+                } else if (err) {
+                    resolve({
+                        statusCode: 422,
+                        message: err.message,
+                        errorStack: err.errorStack
+                    });
+                } else {
+                    if (req.file) {
+                        let response = await resume.update(req);
+                        resolve({ statusCode: response.statusCode, message: response.message, data: response.data });
+                    } else {
+                        resolve({
+                            statusCode: 422,
+                            message: "Resume is required.",
+                            errorStack: ['resume']
+                        });
+                    }
+
+                }
+            })
+
+        })
+        res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
+    } catch (e) {
+        res.status(500).json({
+            messag: e.message
+        })
+    }
+});
+
+
+router.get('/', async (req, res, next) => {
+    try {
+        await resume.download(req, res);
+    } catch (e) {
+        res.status(500).json({
+            messag: e.message
+        })
+    }
+});
 module.exports = router;

@@ -1,11 +1,11 @@
 const User = require('../../models/User');
 const Joi = require('@hapi/joi');
+const fs = require('fs');
 /**
  * 
  * @param {*} req 
  * @description: This function put a resume for an employee
  */
-//const Formidable = require('formidable');
 module.exports.update = async (req) => {
     let response = await User.updateOne({
         _id: req.user._id,
@@ -29,5 +29,25 @@ module.exports.update = async (req) => {
             statusCode: 500,
             message: "Unknown error"
         }
+    }
+}
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @description: This function download a resume for an employee
+ */
+module.exports.download = async (req, res) => {
+    let response = await User.findOne({
+        _id: "5f2ab9ff6ffff27b3cc3a06c",
+    });
+
+    // Download resume
+    if (response.resume) {
+        var filestream = fs.createReadStream(`./public/resumes/${response.resume.filename}`);
+        res.setHeader('Content-disposition', 'attachment; filename=' + response.resume.originalname);
+        filestream.pipe(res)
+    } else {
+        res.status(404).json({ message: "You have not updated resume yet." })
     }
 }
