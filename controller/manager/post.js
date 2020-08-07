@@ -1,4 +1,5 @@
 const Post = require('../../models/Post');
+const Application = require('../../models/Application');
 const Joi = require('@hapi/joi');
 const Schema = {
     // Schema for a Post
@@ -105,6 +106,22 @@ const Schema = {
         _id: Joi.string()
             .alphanum()
             .label("_id")
+    }),
+    //Schema for a List of application
+    applications: Joi.object({
+        page: Joi.number()
+            .min(1)
+            .label("Page")
+            .required(),
+        //post Id   
+        _id: Joi.string()
+            .alphanum()
+            .required()
+            .label("_id"),
+        //applicant email    
+        email: Joi.string()
+            .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
+            .label("Email"),
     })
 }
 
@@ -302,6 +319,57 @@ module.exports.delete = async (req) => {
         } else {
             return {
                 statusCode: 204
+            }
+        }
+    }
+}
+
+
+/**
+ * 
+ * @param {*} req 
+ * @description: This function gets a list of application
+ */
+module.exports.applications = async (req) => {
+    // validation
+    var { error, value } = await Schema.applications.validate({ ...req.params, ...req.query });
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
+        let find = { post_id: value._id };
+        let limit = 10;
+        let skip = (value.page - 1) * limit;
+        //Count the available application
+
+        let populate = {
+            user: {
+                path: 'user_id',
+                as: 'applicant',
+                select: { name: 1, email: 1, resume: 1 }
+            },
+            post: {
+                path: 'post_id',
+                as: 'post',
+                match: { user_id: req.user._id },
+                select: { project_name: 1, client_name: 1, status: 1, role: 1 }
+            }
+        }
+        let count = await Application.find(find).populate(populate.user).populate(populate.post).countDocuments();
+        let applications = [];
+        if (count) {
+            applications = await Application.find(find).populate(populate.user).populate(populate.post).limit(limit).skip(skip);
+        }
+
+        return {
+            statusCode: 200,
+            data: {
+                applications: applications,
+                totalPages: Math.ceil(count / limit)
             }
         }
     }

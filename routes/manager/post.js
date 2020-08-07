@@ -72,4 +72,17 @@ router.delete('/:_id', async (req, res, next) => {
         })
     }
 });
+/**
+ * @description: This route is for list of application for a position
+ */
+router.get('/:_id/application/page/:page', async (req, res, next) => {
+    try {
+        let response = await post.applications(req);
+        res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
+    } catch (e) {
+        res.status(500).json({
+            messag: e.message
+        })
+    }
+});
 module.exports = router;
