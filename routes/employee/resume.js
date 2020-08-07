@@ -65,4 +65,14 @@ router.put('/', async (req, res, next) => {
         })
     }
 });
+
+router.get('/', async (req, res, next) => {
+    try {
+        await resume.download(req, res);
+    } catch (e) {
+        res.status(500).json({
+            messag: e.message
+        })
+    }
+});
 module.exports = router;
