@@ -2,6 +2,10 @@ var express = require('express');
 var router = express.Router();
 
 const post = require('../../controller/manager/post');
+
+/**
+ * @description: This route is for adding a new Position
+ */
 router.post('/', async (req, res, next) => {
     try {
         let response = await post.add(req);
@@ -12,6 +16,10 @@ router.post('/', async (req, res, next) => {
         })
     }
 });
+
+/**
+ * @description: This route is for getting a list of Position added by Manager
+ */
 router.get('/page/:page', async (req, res, next) => {
     try {
         let response = await post.list(req);
@@ -22,6 +30,10 @@ router.get('/page/:page', async (req, res, next) => {
         })
     }
 });
+
+/**
+ * @description: This route is for getting a single Position
+ */
 router.get('/:_id', async (req, res, next) => {
     try {
         let response = await post.get(req);
@@ -32,6 +44,10 @@ router.get('/:_id', async (req, res, next) => {
         })
     }
 });
+
+/**
+ * @description: This route is for updating a position
+ */
 router.patch('/:_id', async (req, res, next) => {
     try {
         let response = await post.update(req);
@@ -42,6 +58,10 @@ router.patch('/:_id', async (req, res, next) => {
         })
     }
 });
+
+/**
+ * @description: This route is for deleting a position
+ */
 router.delete('/:_id', async (req, res, next) => {
     try {
         let response = await post.delete(req);
