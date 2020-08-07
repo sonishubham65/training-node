@@ -70,13 +70,54 @@ describe("Resume update API", () => {
         it("5. Update Again", (done) => {
             chai.request(server)
                 .put("/employee/resume")
-                //.field('a', "b")
                 .set('Content-Type', 'multipart/form-data')
                 .set({ "Authorization": `Bearer ${config.EmployeeToken}` })
                 .attach('resume', correctFile, 'Shubham Nagarro Resume.docx').then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+    })
+
+
+
+    context('Resume Download:', () => {
+        it("1. Authentication", (done) => {
+            chai.request(server)
+                .get("/employee/resume")
+                .then((response) => {
+                    expect(response.statusCode).to.equal(401);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("2. Authorization", (done) => {
+            chai.request(server)
+                .get("/employee/resume")
+                .set({ "Authorization": `Bearer ${config.ManagerToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(403);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
+        it("4. Download resume", (done) => {
+            chai.request(server)
+                .get("/employee/resume")
+                .set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
                     done();
                 }).catch(err => {
                     done(err)

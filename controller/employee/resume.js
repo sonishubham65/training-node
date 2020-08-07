@@ -39,7 +39,7 @@ module.exports.update = async (req) => {
  */
 module.exports.download = async (req, res) => {
     let response = await User.findOne({
-        _id: "5f2ab9ff6ffff27b3cc3a06c",
+        _id: req.user._id,
     });
 
     // Download resume
