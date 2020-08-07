@@ -7,6 +7,10 @@ var uniqid = require('uniqid');
 const fs = require('fs');
 const path = require('path');
 const config = require('../config');
+
+let EmployeeEmail = uniqid() + "@nagarro.com";
+let ManagerEmail = uniqid() + "@nagarro.com";
+
 describe("Testing account API", () => {
     context('Signup:', () => {
         it("1. Validation", (done) => {
@@ -27,45 +31,11 @@ describe("Testing account API", () => {
                 })
         })
 
-        it("2. Duplicate Employee", (done) => {
+        it("2. Create an employee", (done) => {
             chai.request(server)
                 .post("/user/signup").send({
                     "name": "Jr. Employee",
-                    "email": "employee@nagarro.com",
-                    "password": "Pass@123",
-                    "role": "employee"
-                }).then((response) => {
-                    expect(response.statusCode).to.equal(409);
-                    expect(response.body).to.be.an('object').that.has.property('message');
-                    expect(response.body.message).to.be.a("string");
-                    done();
-                }).catch(err => {
-                    done(err)
-                })
-        })
-
-        it("3. Duplicate Manager", (done) => {
-            chai.request(server)
-                .post("/user/signup").send({
-                    "name": "Jr. Manager",
-                    "email": "manager@nagarro.com",
-                    "password": "Pass@123",
-                    "role": "manager"
-                }).then((response) => {
-                    expect(response.statusCode).to.equal(409);
-                    expect(response.body).to.be.an('object').that.has.property('message');
-                    expect(response.body.message).to.be.a("string");
-                    done();
-                }).catch(err => {
-                    done(err)
-                })
-        })
-
-        it("4. Create an employee", (done) => {
-            chai.request(server)
-                .post("/user/signup").send({
-                    "name": "Jr. Employee",
-                    "email": uniqid() + "@nagarrox.com",
+                    "email": EmployeeEmail,
                     "password": "Pass@123",
                     "role": "employee"
                 }).then((response) => {
@@ -78,15 +48,49 @@ describe("Testing account API", () => {
                 })
         })
 
-        it("5. Create a manager", (done) => {
+        it("3. Create a manager", (done) => {
             chai.request(server)
                 .post("/user/signup").send({
                     "name": "Jr. Manager",
-                    "email": uniqid() + "@nagarro.com",
+                    "email": ManagerEmail,
                     "password": "Pass@123",
                     "role": "manager"
                 }).then((response) => {
                     expect(response.statusCode).to.equal(201);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
+        it("4. Duplicate Employee", (done) => {
+            chai.request(server)
+                .post("/user/signup").send({
+                    "name": "Jr. Employee",
+                    "email": EmployeeEmail,
+                    "password": "Pass@123",
+                    "role": "employee"
+                }).then((response) => {
+                    expect(response.statusCode).to.equal(409);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
+        it("5. Duplicate Manager", (done) => {
+            chai.request(server)
+                .post("/user/signup").send({
+                    "name": "Jr. Manager",
+                    "email": ManagerEmail,
+                    "password": "Pass@123",
+                    "role": "manager"
+                }).then((response) => {
+                    expect(response.statusCode).to.equal(409);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
                     done();
@@ -130,7 +134,7 @@ describe("Testing account API", () => {
         it("3. Login as an employee", (done) => {
             chai.request(server)
                 .post("/user/login").send({
-                    "email": "employee@nagarro.com",
+                    "email": EmployeeEmail,
                     "password": "Pass@123",
                 }).then((response) => {
                     expect(response.statusCode).to.equal(200);
@@ -147,7 +151,7 @@ describe("Testing account API", () => {
         it("4. Login as a manager", (done) => {
             chai.request(server)
                 .post("/user/login").send({
-                    "email": "manager@nagarro.com",
+                    "email": ManagerEmail,
                     "password": "Pass@123",
                 }).then((response) => {
                     expect(response.statusCode).to.equal(200);
