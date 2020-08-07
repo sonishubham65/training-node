@@ -1,6 +1,8 @@
 const Post = require('../../models/Post');
 const Application = require('../../models/Application');
 const Joi = require('@hapi/joi');
+var mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 const Schema = {
     // Schema for a Post
     post: Joi.object({
@@ -114,14 +116,22 @@ const Schema = {
             .label("Page")
             .required(),
         //post Id   
-        _id: Joi.string()
+        post_id: Joi.string()
             .alphanum()
             .required()
-            .label("_id"),
+            .label("Postition ID"),
         //applicant email    
         email: Joi.string()
             .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
             .label("Email"),
+    }),
+    //Schema for a application of a post
+    application: Joi.object({
+        //post Id   
+        _id: Joi.string()
+            .alphanum()
+            .required()
+            .label("Application ID"),
     })
 }
 
@@ -341,7 +351,7 @@ module.exports.applications = async (req) => {
             errorStack: error.details[0].path
         }
     } else {
-        let find = { post_id: value._id };
+        let find = { post_id: value.post_id };
         let limit = 10;
         let skip = (value.page - 1) * limit;
         //Count the available application
@@ -372,5 +382,97 @@ module.exports.applications = async (req) => {
                 totalPages: Math.ceil(count / limit)
             }
         }
+    }
+}
+
+/**
+ * 
+ * @param {*} req 
+ * @description: This function gets an application details for a post 
+ */
+module.exports.application = async (req) => {
+    // validation
+    var { error, value } = await Schema.application.validate(req.params);
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
+        let application = await Application.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    let: { userid: "$user_id" },
+                    pipeline: [{
+                        $match: {
+                            $expr: {
+                                $eq: ["$_id", { $toObjectId: "$$userid" }]
+                            }
+                        }
+                    }, {
+                        $project: {
+                            name: 1
+                        }
+                    }],
+                    as: 'user',
+                },
+
+            },
+            {
+                $lookup: {
+                    from: "posts",
+                    let: { userid: "$user_id", postid: "$post_id" },
+                    pipeline: [
+                        {
+                            $match: {
+                                $and: [{
+                                    $expr: {
+                                        $eq: ["$_id", { $toObjectId: "$$postid" }]
+                                    }
+                                }, {
+                                    $expr: {
+                                        $eq: ["$user_id", { $toObjectId: req.user._id }]
+                                    }
+                                }]
+                            }
+                        },
+                        {
+                            $project: {
+                                project_name: 1,
+                                user_id: 1
+                            }
+                        }
+                    ],
+                    as: 'post',
+                },
+
+            },
+            {
+                $unwind: "$user_id"
+            },
+            {
+                $match: {
+                    $and: [
+                        { _id: ObjectId(value._id) },
+                        { "post.user_id": { $exists: true, } }
+                    ]
+                }
+            }
+        ])
+
+        if (application && application.length > 0) {
+            application = application[0];
+        } else {
+            application = undefined;
+        }
+        return application ? {
+            statusCode: 200,
+            data: application
+        } : {
+                statusCode: 204
+            }
     }
 }
