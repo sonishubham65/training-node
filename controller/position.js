@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
-const Post = require('../../models/Post');
-const Application = require('../../models/Application');
+const Post = require('../models/Post');
+const Application = require('../models/Application');
 const Joi = require('@hapi/joi');
 const Schema = {
     // Schema for a list post
