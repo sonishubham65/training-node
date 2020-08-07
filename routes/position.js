@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-const position = require('../controller/employee/position');
+const position = require('../controller/position');
 const authorization = require('../middleware/authorization');
 
 router.get('/page/:page', async (req, res, next) => {
