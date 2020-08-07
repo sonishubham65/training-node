@@ -190,7 +190,6 @@ module.exports.apply = async (req) => {
     } else {
         //Insert the application
         let application = await Application.findOne({ post_id: value._id, user_id: req.user.id });
-        console.log(application)
         if (application) {
             return {
                 statusCode: 409,

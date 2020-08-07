@@ -5,7 +5,7 @@
   "scripts": {
     "start": "SET ENVIRONMENT=production&node app.js",
     "dev": "SET ENVIRONMENT=development&nodemon app.js",
-    "test": "SET ENVIRONMENT=test&mocha routes --recursive"
+    "test": "SET ENVIRONMENT=test&mocha test-cases --recursive"
   },
   "dependencies": {
     "@hapi/joi": "^17.1.1",

@@ -1,12 +1,15 @@
 let chai = require('chai');
 let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
-let server = require('../app');
+let server = require('../../app');
 var expect = chai.expect;
 var uniqid = require('uniqid');
-describe("********************User API********************", () => {
-    context('--signup', () => {
-        it("--validation", (done) => {
+const fs = require('fs');
+const path = require('path');
+const config = require('../config');
+describe("Testing account API", () => {
+    context('Signup:', () => {
+        it("1. Validation", (done) => {
             chai.request(server)
                 .post("/user/signup").send({
                     "name": "Jr.@Employee",
@@ -24,7 +27,7 @@ describe("********************User API********************", () => {
                 })
         })
 
-        it("--duplicate resource", (done) => {
+        it("2. Duplicate Employee", (done) => {
             chai.request(server)
                 .post("/user/signup").send({
                     "name": "Jr. Employee",
@@ -41,7 +44,24 @@ describe("********************User API********************", () => {
                 })
         })
 
-        it("Create an employee", (done) => {
+        it("3. Duplicate Manager", (done) => {
+            chai.request(server)
+                .post("/user/signup").send({
+                    "name": "Jr. Manager",
+                    "email": "manager@nagarro.com",
+                    "password": "Pass@123",
+                    "role": "manager"
+                }).then((response) => {
+                    expect(response.statusCode).to.equal(409);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
+        it("4. Create an employee", (done) => {
             chai.request(server)
                 .post("/user/signup").send({
                     "name": "Jr. Employee",
@@ -58,7 +78,7 @@ describe("********************User API********************", () => {
                 })
         })
 
-        it("Create a manager", (done) => {
+        it("5. Create a manager", (done) => {
             chai.request(server)
                 .post("/user/signup").send({
                     "name": "Jr. Manager",
@@ -74,12 +94,9 @@ describe("********************User API********************", () => {
                     done(err)
                 })
         })
-
     })
-
-
-    context('--Login', () => {
-        it("--validation", (done) => {
+    context('Login:', () => {
+        it("1. Validation", (done) => {
             chai.request(server)
                 .post("/user/login").send({
                     "email": "employee@nagarro.com",
@@ -95,7 +112,7 @@ describe("********************User API********************", () => {
                 })
         })
 
-        it("--no email with us", (done) => {
+        it("2. Email is not registered with us", (done) => {
             chai.request(server)
                 .post("/user/login").send({
                     "email": "xxxxxx@nagarro.com",
@@ -110,7 +127,7 @@ describe("********************User API********************", () => {
                 })
         })
 
-        it("login a user as an employee", (done) => {
+        it("3. Login as an employee", (done) => {
             chai.request(server)
                 .post("/user/login").send({
                     "email": "employee@nagarro.com",
@@ -120,12 +137,14 @@ describe("********************User API********************", () => {
                     expect(response.body).to.contain.all.keys('data', 'token');
                     expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
                     expect(response.body.data.role).to.equal('employee');
+                    config.EmployeeToken = response.body.token;
                     done();
                 }).catch(err => {
                     done(err)
                 })
         })
-        it("login a user as a manager", (done) => {
+
+        it("4. Login as a manager", (done) => {
             chai.request(server)
                 .post("/user/login").send({
                     "email": "manager@nagarro.com",
@@ -135,11 +154,16 @@ describe("********************User API********************", () => {
                     expect(response.body).to.contain.all.keys('data', 'token');
                     expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
                     expect(response.body.data.role).to.equal('manager');
+                    config.ManagerToken = response.body.token;
+
+                    /**
+                     * update configs
+                     */
+                    fs.writeFileSync(path.join(__dirname, '../config.json'), JSON.stringify(config));
                     done();
                 }).catch(err => {
                     done(err)
                 })
         })
-
     })
 })
