@@ -93,7 +93,6 @@ describe("Employee Position API", () => {
                 })
         })
         it("3. Position Get", (done) => {
-            console.log("config.postId", config.postId)
             chai.request(server)
                 .get(`/employee/position/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` })
                 .then((response) => {
@@ -146,6 +145,25 @@ describe("Employee Position API", () => {
                     expect(response.statusCode).to.equal(201);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("4. Position Get After Apply", (done) => {
+            chai.request(server)
+                .get(`/employee/position/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body).that.has.property("data");
+                    expect(response.body.data).to.be.an("object");
+                    expect(response.body.data).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
+                    expect(response.body.data.technologies).to.be.an('array');
+                    expect(response.body.data.user).to.be.an('object');
+                    expect(response.body.data.application).to.be.an('object');
+                    expect(response.body.data.user).to.contain.all.keys("_id", 'email', "name");
+                    expect(response.body.data.application).to.contain.all.keys("_id", "created_at", "status");
+
                     done();
                 }).catch(err => {
                     done(err)

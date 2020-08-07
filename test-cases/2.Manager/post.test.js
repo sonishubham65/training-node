@@ -69,7 +69,6 @@ describe("Manager, Post Crud operations API", () => {
                     expect(response.body.data).to.be.an("object");
                     expect(response.body.data._id).to.be.a("string");
                     config.postId = response.body.data._id;
-                    console.log(config);
                     /**
                      * update configs
                      */

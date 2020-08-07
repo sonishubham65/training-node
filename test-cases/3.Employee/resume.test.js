@@ -28,7 +28,6 @@ describe("Resume update API", () => {
                 .put("/employee/resume")
                 .set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
-                    console.log(response.body)
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
