@@ -351,35 +351,39 @@ module.exports.applications = async (req) => {
             errorStack: error.details[0].path
         }
     } else {
-        let find = { post_id: value.post_id };
         let limit = 10;
         let skip = (value.page - 1) * limit;
-        //Count the available application
 
-        let populate = {
-            user: {
+        //Check if post is related to that manager only
+        let post = await Post.findOne({ _id: value.post_id, user_id: req.user._id });
+        if (post) {
+            // Get applications
+            let applications = await Application.find({
+                post_id: value.post_id
+            }).populate({
                 path: 'user_id',
-                as: 'applicant',
-                select: { name: 1, email: 1, resume: 1 }
-            },
-            post: {
-                path: 'post_id',
-                as: 'post',
-                match: { user_id: req.user._id },
-                select: { project_name: 1, client_name: 1, status: 1, role: 1 }
-            }
-        }
-        let count = await Application.find(find).populate(populate.user).populate(populate.post).countDocuments();
-        let applications = [];
-        if (count) {
-            applications = await Application.find(find).populate(populate.user).populate(populate.post).limit(limit).skip(skip);
-        }
+                select: { name: 1, email: 1, _id: 0 }
+            }).select({ post_id: 0 }).limit(limit).skip(skip);
 
-        return {
-            statusCode: 200,
-            data: {
-                applications: applications,
-                totalPages: Math.ceil(count / limit)
+            // Get applications count
+            let total = await Application.find({
+                post_id: value.post_id
+            }).populate({
+                path: 'user_id',
+                select: { name: 1, email: 1, _id: 0 }
+            }).select({ post_id: 0 }).countDocuments();
+
+            return {
+                statusCode: 200,
+                data: {
+                    post: post,
+                    applications: applications,
+                    totalPages: Math.ceil(total / limit)
+                }
+            }
+        } else {
+            return {
+                statsuCode: 204
             }
         }
     }
@@ -407,67 +411,31 @@ module.exports.application = async (req) => {
                     from: "users",
                     let: { userid: "$user_id" },
                     pipeline: [{
-                        $match: {
-                            $expr: {
-                                $eq: ["$_id", { $toObjectId: "$$userid" }]
-                            }
-                        }
+                        $match: { $expr: { $eq: ["$_id", { $toObjectId: "$$userid" }] } }
                     }, {
-                        $project: {
-                            name: 1
-                        }
+                        $project: { _id: 0, name: 1, email: 1, resume: { originalname: 1, filename: 1 } }
                     }],
                     as: 'user',
                 },
-
             },
+            { $unwind: "$user" },
             {
                 $lookup: {
                     from: "posts",
                     let: { userid: "$user_id", postid: "$post_id" },
-                    pipeline: [
-                        {
-                            $match: {
-                                $and: [{
-                                    $expr: {
-                                        $eq: ["$_id", { $toObjectId: "$$postid" }]
-                                    }
-                                }, {
-                                    $expr: {
-                                        $eq: ["$user_id", { $toObjectId: req.user._id }]
-                                    }
-                                }]
-                            }
-                        },
-                        {
-                            $project: {
-                                project_name: 1,
-                                user_id: 1
-                            }
+                    pipeline: [{
+                        $match: {
+                            $expr: { $eq: ["$_id", { $toObjectId: "$$postid" }] }
                         }
-                    ],
+                    }],
                     as: 'post',
                 },
-
             },
-            {
-                $unwind: "$user_id"
-            },
-            {
-                $match: {
-                    $and: [
-                        { _id: ObjectId(value._id) },
-                        { "post.user_id": { $exists: true, } }
-                    ]
-                }
-            }
+            { $unwind: "$post" },
+            { $match: { $and: [{ _id: ObjectId(value._id) }, { "post.user_id": ObjectId(req.user._id) }] } },
+            { $project: { _id: 1, created_at: 1, user: 1, post: 1 } },
         ])
 
-        if (application && application.length > 0) {
-            application = application[0];
-        } else {
-            application = undefined;
-        }
         return application ? {
             statusCode: 200,
             data: application
