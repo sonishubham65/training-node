@@ -1,4 +1,5 @@
 const User = require('../models/User');
+const Token = require('../models/Token');
 const bcrypt = require('bcrypt');
 const Joi = require('@hapi/joi');
 const JWT = require('jsonwebtoken');
@@ -131,14 +132,25 @@ module.exports.login = async (req) => {
             // Compare password
             let result = await bcrypt.compare(value.password, user.password);
             if (result) {
-                var token = JWT.sign({ _id: user._id }, process.env.JWT_passphrase);
+                var token = JWT.sign({ _id: user._id, exp: Math.floor(Date.now() / 1000) + (60 * parseInt(process.env.JWT_EXPIRY)) }, process.env.JWT_passphrase);
                 user.login_at = Date.now();
-                let result = await user.save();
+                await user.save();
+
+                let response = await Token.create({
+                    token: token,
+                });
+                var refreshToken = JWT.sign({ _id: response._id }, process.env.Refresh_JWT_passphrase);
+                console.log(refreshToken);
+
                 // return successful
                 return {
                     statusCode: 200,
                     data: user,
-                    token: token
+                    token: {
+                        access: token,
+                        refresh: refreshToken
+                    },
+
                 }
             } else {
                 // return with invalid credentials
