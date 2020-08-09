@@ -86,6 +86,7 @@ const Schema = {
             .required(),
         _id: Joi.string()
             .alphanum()
+            .length(24)
             .label("_id"),
         project_name: Joi.string()
             .min(3)
@@ -107,6 +108,7 @@ const Schema = {
     get: Joi.object({
         _id: Joi.string()
             .alphanum()
+            .length(24)
             .label("_id")
     }),
     //Schema for a List of application
@@ -118,6 +120,7 @@ const Schema = {
         //post Id   
         post_id: Joi.string()
             .alphanum()
+            .length(24)
             .required()
             .label("Postition ID"),
         //applicant email    
@@ -130,6 +133,7 @@ const Schema = {
         //post Id   
         _id: Joi.string()
             .alphanum()
+            .length(24)
             .required()
             .label("Application ID"),
     })
@@ -355,7 +359,7 @@ module.exports.applications = async (req) => {
         let skip = (value.page - 1) * limit;
 
         //Check if post is related to that manager only
-        let post = await Post.findOne({ _id: value.post_id, user_id: req.user._id });
+        let post = await Post.findOne({ _id: value.post_id, user_id: req.user._id }).select(['project_name', 'client_name', 'created_at', 'status', 'role']);
         if (post) {
             // Get applications
             let applications = await Application.find({
@@ -435,12 +439,16 @@ module.exports.application = async (req) => {
             { $match: { $and: [{ _id: ObjectId(value._id) }, { "post.user_id": ObjectId(req.user._id) }] } },
             { $project: { _id: 1, created_at: 1, user: 1, post: 1 } },
         ])
-
-        return application ? {
-            statusCode: 200,
-            data: application
-        } : {
+        if (application) {
+            return {
+                statusCode: 200,
+                data: application[0]
+            }
+        } else {
+            return {
                 statusCode: 204
             }
+        }
+
     }
 }
