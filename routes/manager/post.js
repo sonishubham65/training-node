@@ -88,7 +88,7 @@ router.get('/:post_id/application/page/:page', async (req, res, next) => {
 /**
  * @description: This route is to get an application for a position
  */
-router.get('/application/:_id', async (req, res, next) => {
+router.get('/application/details/:_id', async (req, res, next) => {
     try {
         let response = await post.application(req);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
