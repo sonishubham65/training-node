@@ -12,6 +12,7 @@ const Schema = {
             .required(),
         _id: Joi.string()
             .alphanum()
+            .length(24)
             .label("_id"),
         project_name: Joi.string()
             .min(3)
@@ -33,6 +34,7 @@ const Schema = {
     get: Joi.object({
         _id: Joi.string()
             .alphanum()
+            .length(24)
             .label("_id")
     })
 }

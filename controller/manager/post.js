@@ -1,5 +1,8 @@
 const Post = require('../../models/Post');
+const Application = require('../../models/Application');
 const Joi = require('@hapi/joi');
+var mongoose = require('mongoose');
+const ObjectId = mongoose.Types.ObjectId;
 const Schema = {
     // Schema for a Post
     post: Joi.object({
@@ -83,6 +86,7 @@ const Schema = {
             .required(),
         _id: Joi.string()
             .alphanum()
+            .length(24)
             .label("_id"),
         project_name: Joi.string()
             .min(3)
@@ -104,7 +108,34 @@ const Schema = {
     get: Joi.object({
         _id: Joi.string()
             .alphanum()
+            .length(24)
             .label("_id")
+    }),
+    //Schema for a List of application
+    applications: Joi.object({
+        page: Joi.number()
+            .min(1)
+            .label("Page")
+            .required(),
+        //post Id   
+        post_id: Joi.string()
+            .alphanum()
+            .length(24)
+            .required()
+            .label("Postition ID"),
+        //applicant email    
+        email: Joi.string()
+            .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
+            .label("Email"),
+    }),
+    //Schema for a application of a post
+    application: Joi.object({
+        //post Id   
+        _id: Joi.string()
+            .alphanum()
+            .length(24)
+            .required()
+            .label("Application ID"),
     })
 }
 
@@ -304,5 +335,120 @@ module.exports.delete = async (req) => {
                 statusCode: 204
             }
         }
+    }
+}
+
+
+/**
+ * 
+ * @param {*} req 
+ * @description: This function gets a list of application
+ */
+module.exports.applications = async (req) => {
+    // validation
+    var { error, value } = await Schema.applications.validate({ ...req.params, ...req.query });
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
+        let limit = 10;
+        let skip = (value.page - 1) * limit;
+
+        //Check if post is related to that manager only
+        let post = await Post.findOne({ _id: value.post_id, user_id: req.user._id }).select(['project_name', 'client_name', 'created_at', 'status', 'role']);
+        if (post) {
+            // Get applications
+            let applications = await Application.find({
+                post_id: value.post_id
+            }).populate({
+                path: 'user_id',
+                select: { name: 1, email: 1, _id: 0 }
+            }).select({ post_id: 0 }).limit(limit).skip(skip);
+
+            // Get applications count
+            let total = await Application.find({
+                post_id: value.post_id
+            }).populate({
+                path: 'user_id',
+                select: { name: 1, email: 1, _id: 0 }
+            }).select({ post_id: 0 }).countDocuments();
+
+            return {
+                statusCode: 200,
+                data: {
+                    post: post,
+                    applications: applications,
+                    totalPages: Math.ceil(total / limit)
+                }
+            }
+        } else {
+            return {
+                statsuCode: 204
+            }
+        }
+    }
+}
+
+/**
+ * 
+ * @param {*} req 
+ * @description: This function gets an application details for a post 
+ */
+module.exports.application = async (req) => {
+    // validation
+    var { error, value } = await Schema.application.validate(req.params);
+    if (error) {
+        // return with validation error message
+        return {
+            statusCode: 422,
+            message: error.message,
+            errorStack: error.details[0].path
+        }
+    } else {
+        let application = await Application.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    let: { userid: "$user_id" },
+                    pipeline: [{
+                        $match: { $expr: { $eq: ["$_id", { $toObjectId: "$$userid" }] } }
+                    }, {
+                        $project: { _id: 0, name: 1, email: 1, resume: { originalname: 1, filename: 1 } }
+                    }],
+                    as: 'user',
+                },
+            },
+            { $unwind: "$user" },
+            {
+                $lookup: {
+                    from: "posts",
+                    let: { userid: "$user_id", postid: "$post_id" },
+                    pipeline: [{
+                        $match: {
+                            $expr: { $eq: ["$_id", { $toObjectId: "$$postid" }] }
+                        }
+                    }],
+                    as: 'post',
+                },
+            },
+            { $unwind: "$post" },
+            { $match: { $and: [{ _id: ObjectId(value._id) }, { "post.user_id": ObjectId(req.user._id) }] } },
+            { $project: { _id: 1, created_at: 1, user: 1, post: 1 } },
+        ])
+        if (application) {
+            return {
+                statusCode: 200,
+                data: application[0]
+            }
+        } else {
+            return {
+                statusCode: 204
+            }
+        }
+
     }
 }
