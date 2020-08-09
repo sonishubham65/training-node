@@ -141,15 +141,12 @@ module.exports.login = async (req) => {
                 });
                 var refreshToken = JWT.sign({ _id: response._id }, process.env.Refresh_JWT_passphrase);
                 console.log(refreshToken);
-
                 // return successful
                 return {
                     statusCode: 200,
                     data: user,
-                    token: {
-                        access: token,
-                        refresh: refreshToken
-                    },
+                    token: token,
+                    refreshToken: refreshToken
 
                 }
             } else {
