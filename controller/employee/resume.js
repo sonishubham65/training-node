@@ -2,9 +2,9 @@ const User = require('../../models/User');
 const Joi = require('@hapi/joi');
 const fs = require('fs');
 /**
- * 
- * @param {*} req 
- * @description: This function put a resume for an employee
+ * @description: This function updates resume.
+ * updates a post.
+ * @returns: It returns statuscode and a message as successful.
  */
 module.exports.update = async (req) => {
     let response = await User.updateOne({
@@ -18,7 +18,6 @@ module.exports.update = async (req) => {
         }
     }, { runValidators: true });
 
-    // return successfully
     if (response.nModified) {
         return {
             statusCode: 200,
@@ -32,10 +31,10 @@ module.exports.update = async (req) => {
     }
 }
 /**
- * 
- * @param {*} req 
- * @param {*} res 
- * @description: This function download a resume for an employee
+ * @description: This function downloads resume of employee.
+ * With a proper validation of requested data.
+ * gets the resume of employee.
+ * @returns: It downloads the resume.
  */
 module.exports.download = async (req, res) => {
     let response = await User.findOne({
