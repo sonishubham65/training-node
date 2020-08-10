@@ -4,7 +4,8 @@ var router = express.Router();
 const post = require('../../controller/manager/post');
 
 /**
- * @description: This route is for adding a new Position
+ * @description: This route defines the route path for Creating a new Post.
+ * @returns: It returns http status as 201 and a message as successful.
  */
 router.post('/', async (req, res, next) => {
     try {
@@ -18,7 +19,8 @@ router.post('/', async (req, res, next) => {
 });
 
 /**
- * @description: This route is for getting a list of Position added by Manager
+ * @description: This route defines the route path for Getting all Post
+ * @returns: It returns http status as 200 with data and number of more pages.
  */
 router.get('/page/:page', async (req, res, next) => {
     try {
@@ -32,7 +34,8 @@ router.get('/page/:page', async (req, res, next) => {
 });
 
 /**
- * @description: This route is for getting a single Position
+ * @description: This route defines the route path for Getting Single Post
+ * @returns: It returns http status as 200 with post data.
  */
 router.get('/:_id', async (req, res, next) => {
     try {
@@ -46,7 +49,8 @@ router.get('/:_id', async (req, res, next) => {
 });
 
 /**
- * @description: This route is for updating a position
+ * @description: This route defines the route path for Updaing a Post
+ * @returns: It returns http status as 202 and a message as successful.
  */
 router.patch('/:_id', async (req, res, next) => {
     try {
@@ -60,7 +64,8 @@ router.patch('/:_id', async (req, res, next) => {
 });
 
 /**
- * @description: This route is for deleting a position
+ * @description: This route defines the route path for deleting a Post
+ * @returns: It returns http status as 200 and a message as successful.
  */
 router.delete('/:_id', async (req, res, next) => {
     try {
@@ -72,8 +77,10 @@ router.delete('/:_id', async (req, res, next) => {
         })
     }
 });
+
 /**
- * @description: This route is for list of application for a position
+ * @description: This route defines the route path for getting list of applications for a post.
+ * @returns: It returns http status as 200 with post data, list of applications and page count.
  */
 router.get('/:post_id/application/page/:page', async (req, res, next) => {
     try {
@@ -85,8 +92,10 @@ router.get('/:post_id/application/page/:page', async (req, res, next) => {
         })
     }
 });
+
 /**
- * @description: This route is to get an application for a position
+ * @description: This route defines the route path for details of an application.
+ * @returns: It returns http status as 200 and data of application and post.
  */
 router.get('/application/details/:_id', async (req, res, next) => {
     try {
