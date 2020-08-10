@@ -139,7 +139,8 @@ module.exports.login = async (req) => {
         }
     } else {
         // Gets the user for the email address
-        var user = await User.findOne({ email: value.email }).select('+password');
+        var user = await User.findOne({ email: value.email }).select('_id', '+password');
+        console.log(user)
         if (user) {
             // Compare the password
             let result = await bcrypt.compare(value.password, user.password);
