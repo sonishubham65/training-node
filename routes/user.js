@@ -16,9 +16,23 @@ router.post('/signup', async (req, res, next) => {
 router.post('/login', async (req, res, next) => {
   try {
     let response = await user.login(req);
-    if (response.data && response.data.refreshToken) {
-      res.cookie("refreshToken", refreshToken);
+    if (response.refresh_token) {
+      res.cookie("refresh_token", response.refresh_token, {
+        expires: new Date(Date.now() + 9999999),
+        httpOnly: true
+      });
     }
+    res.status(response.statusCode).json({ message: response.message, token: response.token })
+  } catch (e) {
+    res.status(500).json({
+      messag: e.message
+    })
+  }
+});
+
+router.get('/authorize', async (req, res, next) => {
+  try {
+    let response = await user.authorize(req);
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data, token: response.token })
   } catch (e) {
     res.status(500).json({

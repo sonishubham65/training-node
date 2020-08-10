@@ -139,15 +139,13 @@ module.exports.login = async (req) => {
                 let response = await Token.create({
                     token: token,
                 });
-                var refreshToken = JWT.sign({ _id: response._id }, process.env.Refresh_JWT_passphrase);
-                console.log(refreshToken);
+                var refresh_token = JWT.sign({ _id: response._id }, process.env.Refresh_JWT_passphrase);
                 // return successful
                 return {
                     statusCode: 200,
                     data: user,
                     token: token,
-                    refreshToken: refreshToken
-
+                    refresh_token: refresh_token
                 }
             } else {
                 // return with invalid credentials
@@ -161,6 +159,44 @@ module.exports.login = async (req) => {
             return {
                 statusCode: 401,
                 message: "We do not have an account with this email address."
+            }
+        }
+    }
+}
+
+/**
+ * 
+ * @param {*} req
+ * @description: This function access token by refresh token 
+ */
+module.exports.authorize = async (req) => {
+    let refresh_token = req.cookies.refresh_token;
+    console.log(refresh_token);
+    if (!refresh_token) {
+        // return with validation error message
+        return {
+            statusCode: 400,
+            message: "Refresh token missing."
+        }
+    } else {
+        //parse refresh token 
+        let result = JWT.verify(refresh_token, process.env.Refresh_JWT_passphrase);
+        //verify refresh token 
+        let response = await Token.findOne({ _id: result._id });
+        if (response.token) {
+            //parse token retrieved from db 
+            let tokenParse = JWT.verify(response.token, process.env.JWT_passphrase, { ignoreExpiration: true });
+            //make a new access token 
+            var token = JWT.sign({ _id: tokenParse._id, exp: Math.floor(Date.now() / 1000) + (60 * parseInt(process.env.JWT_EXPIRY)) }, process.env.JWT_passphrase);
+            //return new access token
+            return {
+                statusCode: 200,
+                token: token
+            }
+        } else {
+            return {
+                statusCode: 400,
+                message: "Invalid refresh token."
             }
         }
     }
