@@ -122,11 +122,11 @@ const loginSchema = Joi.object({
 });
 
 /**
- * @description: This function logins a new user.
+ * @description: This function logins a user.
  * With a proper validation of requested data.
- * Checks with duplicate email entries.
- * Create a hash for password and create a new user.
- * @returns: It returns statuscode and a message as successful.
+ * Checks with email entries.
+ * Create access token and refresh token.
+ * @returns: It returns statuscode userdata and token.
  */
 module.exports.login = async (req) => {
     // Validate the requested data
@@ -180,11 +180,14 @@ module.exports.login = async (req) => {
 }
 
 /**
- * 
- * @param {*} req
- * @description: This function access token by refresh token 
+ * @description: This function authorize a user.
+ * With a proper validation of cookie data.
+ * verify the refresh token.
+ * grant a new access token.
+ * @returns: It returns statuscode and new access token.
  */
 module.exports.authorize = async (req) => {
+    // Validate cookies
     let refresh_token = req.cookies.refresh_token;
     if (!refresh_token) {
         return {
@@ -192,16 +195,17 @@ module.exports.authorize = async (req) => {
             message: "Refresh token missing."
         }
     } else {
-        //parse refresh token 
+        // Parse refresh token 
         let result = JWT.verify(refresh_token, process.env.Refresh_JWT_passphrase);
-        //verify refresh token 
+        // Verify refresh token 
         let response = await Token.findOne({ _id: result._id });
         if (response.token) {
-            //parse token retrieved from db 
+            // parse token retrieved from database
             let tokenParse = JWT.verify(response.token, process.env.JWT_passphrase, { ignoreExpiration: true });
-            //make a new access token 
+
+            // make a new access token 
             var token = JWT.sign({ _id: tokenParse._id, exp: Math.floor(Date.now() / 1000) + (60 * parseInt(process.env.JWT_EXPIRY)) }, process.env.JWT_passphrase);
-            //return new access token
+
             return {
                 statusCode: 200,
                 token: token
