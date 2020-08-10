@@ -22,7 +22,7 @@ router.post('/login', async (req, res, next) => {
         httpOnly: true
       });
     }
-    res.status(response.statusCode).json({ message: response.message, token: response.token })
+    res.status(response.statusCode).json({ message: response.message, data: response.data, token: response.token })
   } catch (e) {
     res.status(500).json({
       messag: e.message
