@@ -118,6 +118,9 @@ describe("Resume update API", () => {
                 .set({ "Authorization": `Bearer ${config.EmployeeToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
+                    let result = response.text;
+                    var testResume = fs.readFileSync(path.join(__dirname, '../../test-files/Shubham Nagarro Resume.docx'));
+                    expect(testResume.toString()).to.equal(result.toString());
                     done();
                 }).catch(err => {
                     done(err)
