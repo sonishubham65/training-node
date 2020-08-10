@@ -107,4 +107,17 @@ router.get('/application/details/:_id', async (req, res, next) => {
         })
     }
 });
+/**
+ * @description: This route defines the route path for donwloading resume for an application.
+ * @returns: It downloads resume.
+ */
+router.get('/application/resume/:_id', async (req, res, next) => {
+    try {
+        await post.resume(req, res);
+    } catch (e) {
+        res.status(500).json({
+            messag: e.message
+        })
+    }
+});
 module.exports = router;

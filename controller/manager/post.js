@@ -1,6 +1,7 @@
 const Post = require('../../models/Post');
 const Application = require('../../models/Application');
 const Joi = require('@hapi/joi');
+const fs = require('fs')
 var mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const Schema = {
@@ -444,7 +445,7 @@ module.exports.application = async (req) => {
             { $match: { $and: [{ _id: ObjectId(value._id) }, { "post.user_id": ObjectId(req.user._id) }] } },
             { $project: { _id: 1, created_at: 1, user: 1, post: 1 } },
         ])
-        if (application) {
+        if (application.length) {
             return {
                 statusCode: 200,
                 data: application[0]
@@ -453,6 +454,71 @@ module.exports.application = async (req) => {
             return {
                 statusCode: 204
             }
+        }
+
+    }
+}
+
+
+/**
+ * @description: This function downloads resume for an application.
+ * With a proper validation of requested data.
+ * gets the resume details of an applications.
+ * @returns: It downloads the resume.
+ */
+module.exports.resume = async (req, res) => {
+    // Validate the requested data
+    var { error, value } = await Schema.application.validate(req.params);
+    if (error) {
+        res.status(422).json({
+            message: error.message,
+            errorStack: error.details[0].path
+        })
+    } else {
+        let application = await Application.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    let: { userid: "$user_id" },
+                    pipeline: [{
+                        $match: { $expr: { $eq: ["$_id", { $toObjectId: "$$userid" }] } }
+                    }, {
+                        $project: { _id: 0, name: 1, email: 1, resume: { originalname: 1, filename: 1 } }
+                    }],
+                    as: 'user',
+                },
+            },
+            { $unwind: "$user" },
+            {
+                $lookup: {
+                    from: "posts",
+                    let: { userid: "$user_id", postid: "$post_id" },
+                    pipeline: [{
+                        $match: {
+                            $expr: { $eq: ["$_id", { $toObjectId: "$$postid" }] }
+                        }
+                    }],
+                    as: 'post',
+                },
+            },
+            { $unwind: "$post" },
+            { $match: { $and: [{ _id: ObjectId(value._id) }, { "post.user_id": ObjectId(req.user._id) }] } },
+            { $project: { _id: 1, created_at: 1, user: 1, post: 1 } },
+        ])
+        if (application.length) {
+            let resume = application[0].user.resume;
+            if (resume) {
+                var filestream = fs.createReadStream(`./public/resumes/${resume.filename}`);
+                res.setHeader('Content-disposition', 'attachment; filename=' + resume.originalname);
+                filestream.pipe(res)
+            } else {
+                res.status(500).json({
+                    message: "Resume not found."
+                });
+            }
+
+        } else {
+            res.status(204);
         }
 
     }
