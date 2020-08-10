@@ -3,7 +3,8 @@ let chaiHttp = require('chai-http');
 chai.use(chaiHttp);
 let server = require('../../app');
 var expect = chai.expect;
-
+const fs = require('fs');
+const path = require('path');
 describe("Manager Application API", () => {
     let config = require('../config.json');
 
@@ -107,6 +108,52 @@ describe("Manager Application API", () => {
                     expect(response.body.data.post).to.contain.all.keys('_id', 'technologies', 'project_name', 'client_name', 'created_at', 'description', 'status', 'role');
                     expect(response.body.data.post.technologies).to.be.an("array");
 
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+    })
+
+    /**
+     * @description: All the test case for download resume for an application
+     */
+    context('Application details:', () => {
+        it("1. Authentication", (done) => {
+            chai.request(server)
+                .get(`/manager/post/application/resume/${config.application_id}`).then((response) => {
+                    expect(response.statusCode).to.equal(401);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
+        it("2. Validation", (done) => {
+            chai.request(server)
+                .get(`/manager/post/application/resume/x`)
+                .set({ "Authorization": `Bearer ${config.ManagerToken}` }).then((response) => {
+                    expect(response.statusCode).to.equal(422);
+                    expect(response.body).to.be.an('object').that.has.property('message');
+                    expect(response.body.message).to.be.a("string");
+                    expect(response.body.errorStack).to.be.an("array");
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
+        it("3. Application Resume download", (done) => {
+            chai.request(server)
+                .get(`/manager/post/application/resume/${config.application_id}`)
+                .set({ "Authorization": `Bearer ${config.ManagerToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    let result = response.text;
+                    var testResume = fs.readFileSync(path.join(__dirname, '../../test-files/Shubham Nagarro Resume.docx'));
+                    expect(testResume.toString()).to.equal(result.toString());
                     done();
                 }).catch(err => {
                     done(err)
