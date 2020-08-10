@@ -156,7 +156,8 @@ module.exports.login = async (req) => {
 
                 // Create a refresh token
                 var refresh_token = JWT.sign({ _id: response._id }, process.env.Refresh_JWT_passphrase);
-
+                // Remove password field from user data
+                user.password = undefined;
                 return {
                     statusCode: 200,
                     data: user,
