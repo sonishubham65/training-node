@@ -4,7 +4,7 @@ const Post = require('../models/Post');
 const Application = require('../models/Application');
 const Joi = require('@hapi/joi');
 const Schema = {
-    // Schema for a list post
+    // Schema validator for a Positions listing
     list: Joi.object({
         page: Joi.number()
             .min(1)
@@ -30,7 +30,7 @@ const Schema = {
                 return errors;
             })
     }),
-    // Schema for a post
+    // Schema validator for a Single Position
     get: Joi.object({
         _id: Joi.string()
             .alphanum()
@@ -39,15 +39,15 @@ const Schema = {
     })
 }
 /**
- * 
- * @param {*} req 
- * @description: This function gets a list of positions
+ * @description: This function gets the list of open positions.
+ * With a proper validation of requested parameters and data.
+ * gets a list of positions.
+ * @returns: It returns statuscode, list of positions and page count.
  */
 module.exports.list = async (req) => {
-    // validation
+    // Schema validation for listing positions 
     var { error, value } = await Schema.list.validate({ ...req.params, ...req.query });
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
@@ -55,21 +55,25 @@ module.exports.list = async (req) => {
         }
     } else {
         let find = { status: "open" };
-        /**
-         * Filters for _id and project name
-         */
+
+        // Filter by _id
         if (value._id) {
             find._id = value._id;
         }
+        // Filter by Project Name
         if (value.project_name) {
             find.project_name = { $regex: new RegExp(`.*${value.project_name}.*`), $options: "i" }
         }
+
+        // Limits and offset
         let limit = 2;
         let skip = (value.page - 1) * limit;
+
         //Count the available documents
         let count = await Post.find(find).countDocuments();
         let posts = [];
         if (count) {
+
             //Get the documents
             posts = await Post.find(find).skip(skip).limit(limit);
         }
@@ -84,15 +88,15 @@ module.exports.list = async (req) => {
 }
 
 /**
- * 
- * @param {*} req 
- * @description: This function gets a post
+ * @description: This function gets the details of a position.
+ * With a proper validation of requested parameters and data.
+ * Gets details of a position.
+ * @returns: It returns statuscode and details of position.
  */
 module.exports.get = async (req) => {
     // validation
     var { error, value } = await Schema.get.validate({ ...req.params });
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
@@ -124,8 +128,8 @@ module.exports.get = async (req) => {
                     ],
                     as: 'application',
                 },
-
-            }, {
+            },
+            {
                 $lookup: {
                     from: "users",
                     let: { userid: "$user_id" },
@@ -146,20 +150,16 @@ module.exports.get = async (req) => {
                     ],
                     as: 'user',
                 },
-
-            }
+            },
+            { $unwind: '$user' }
         ])
+        console.log(post)
         if (post.length) {
             post = post[0];
             if (post.application.length) {
-                post.application = post.application[0];
+                post.application = post.application[0]
             } else {
-                delete post.application;
-            }
-            if (post.user.length) {
-                post.user = post.user[0];
-            } else {
-                delete post.user;
+                post.application = undefined
             }
             return {
                 statusCode: 200,
