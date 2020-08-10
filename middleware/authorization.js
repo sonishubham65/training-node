@@ -1,3 +1,11 @@
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @description: This middleware authorize the person for the particular route.
+ * Middlware helps to protecte the route and checks the user role as 'manager'.
+ */
 module.exports.manager = (req, res, next) => {
     if (req.user.role == 'manager') {
         next();
@@ -7,6 +15,14 @@ module.exports.manager = (req, res, next) => {
         })
     }
 }
+/**
+ * 
+ * @param {*} req 
+ * @param {*} res 
+ * @param {*} next 
+ * @description: This middleware authorize the person for the particular route.
+ * Middlware helps to protecte the route and checks the user role as 'employee'.
+ */
 module.exports.employee = (req, res, next) => {
     if (req.user.role == 'employee') {
         next();

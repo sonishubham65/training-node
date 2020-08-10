@@ -139,6 +139,7 @@ describe("Testing account API", () => {
                 }).then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.contain.all.keys('data', 'token');
+                    expect(response.body.token).to.be.a('string');
                     expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
                     expect(response.body.data.role).to.equal('employee');
                     config.EmployeeToken = response.body.token;
@@ -156,7 +157,8 @@ describe("Testing account API", () => {
                 }).then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.contain.all.keys('data', 'token');
-                    expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
+                    expect(response.body.token).to.be.a('string');
+                    expect(response.body.data).to.contain.all.keys('role', 'status', '_id', 'name', 'email', 'created_at', 'login_at');
                     expect(response.body.data.role).to.equal('manager');
                     config.ManagerToken = response.body.token;
 

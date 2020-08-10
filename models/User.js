@@ -17,6 +17,11 @@ var userSchema = new Schema({
     },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date },
+    status: {
+        type: String,
+        enum: ['active', 'inactive'],
+        default: 'active'
+    },
     resume: Object,
     login_at: { type: Date }
 });
