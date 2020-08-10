@@ -2,11 +2,17 @@ var express = require('express');
 var router = express.Router();
 
 const user = require('../controller/user');
+
+/**
+ * @description: This route defines the route path for Signup api.
+ * @returns: It returns http status as 200 and a message as successful.
+ */
 router.post('/signup', async (req, res, next) => {
   try {
     let response = await user.signup(req);
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack })
   } catch (e) {
+    //Handle all the uncaught errors.
     res.status(500).json({
       messag: e.message
     })

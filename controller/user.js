@@ -3,7 +3,11 @@ const Token = require('../models/Token');
 const bcrypt = require('bcrypt');
 const Joi = require('@hapi/joi');
 const JWT = require('jsonwebtoken');
-// Signup request Schema validator
+const CONFIG = require('../config');
+
+/**
+ * @description: Schema validator for Signup
+*/
 const signupSchema = Joi.object({
     name: Joi.string()
         .min(3)
@@ -26,7 +30,7 @@ const signupSchema = Joi.object({
         .max(30)
         .label("Password")
         .required()
-        .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,30}$'))
+        .pattern(new RegExp(CONFIG.validation.password.regex))
         .error(errors => {
             errors.forEach(error => {
                 switch (error.code) {
@@ -40,31 +44,32 @@ const signupSchema = Joi.object({
 
     email: Joi.string()
         .required()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
+        .email({ minDomainSegments: 2, tlds: { allow: CONFIG.validation.email.allow } })
         .label("Email"),
     role: Joi.any().valid('employee', 'manager').label("Role").required()
 });
 
 
 /**
- * 
- * @param {*} req 
- * @description: This function register a user and throw an error if resource is duplicate.
+ * @description: This function registers a new user.
+ * With a proper validation of requested data.
+ * Checks with duplicate email entries.
+ * Create a hash for password and create a new user.
+ * @returns: It returns statuscode and a message as successful.
  */
 module.exports.signup = async (req) => {
-    // validation
+    // Validate the requested data
     var { error, value } = await signupSchema.validate(req.body);
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
             errorStack: error.details[0].path
         }
     } else {
+        // Check the existance of email address
         var user = await User.findOne({ email: value.email });
         if (user) {
-            // return with duplicate resource message
             return {
                 statusCode: 409,
                 message: "User already exists with this email address."
@@ -73,13 +78,15 @@ module.exports.signup = async (req) => {
             // Create a hash for password
             let salt = await bcrypt.genSalt(parseInt(process.env.ENCRYPTION_saltRounds));
             let hash = await bcrypt.hash(value.password, salt);
+
+            // Create a new user
             user = await User.create({
                 name: value.name,
                 email: value.email,
                 password: hash,
                 role: value.role,
             });
-            // return successfully
+
             return {
                 statusCode: 201,
                 message: "You're registered successfully."
@@ -88,18 +95,20 @@ module.exports.signup = async (req) => {
     }
 }
 
-// Login request Schema validator
+/**
+ * @description: Schema validator for Login
+*/
 const loginSchema = Joi.object({
     email: Joi.string()
         .required()
-        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
+        .email({ minDomainSegments: 2, tlds: { allow: CONFIG.validation.email.allow } })
         .label("Email"),
     password: Joi.string()
         .min(8)
         .max(30)
         .label("Password")
         .required()
-        .pattern(new RegExp('^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#\$%\^&\*]).{8,30}$'))
+        .pattern(new RegExp(CONFIG.validation.password.regex))
         .error(errors => {
             errors.forEach(error => {
                 switch (error.code) {
@@ -111,36 +120,43 @@ const loginSchema = Joi.object({
             return errors;
         })
 });
+
 /**
- * 
- * @param {*} req
- * @description: This function get user details and token with authenticated credentials 
+ * @description: This function logins a new user.
+ * With a proper validation of requested data.
+ * Checks with duplicate email entries.
+ * Create a hash for password and create a new user.
+ * @returns: It returns statuscode and a message as successful.
  */
 module.exports.login = async (req) => {
-    // validation
+    // Validate the requested data
     var { error, value } = await loginSchema.validate(req.body);
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
             errorStack: error.details[0].path
         }
     } else {
+        // Gets the user for the email address
         var user = await User.findOne({ email: value.email }).select('+password');
         if (user) {
-            // Compare password
+            // Compare the password
             let result = await bcrypt.compare(value.password, user.password);
             if (result) {
+                // Create a access token
                 var token = JWT.sign({ _id: user._id, exp: Math.floor(Date.now() / 1000) + (60 * parseInt(process.env.JWT_EXPIRY)) }, process.env.JWT_passphrase);
                 user.login_at = Date.now();
                 await user.save();
 
+                // Create a Auth token
                 let response = await Token.create({
                     token: token,
                 });
+
+                // Create a refresh token
                 var refresh_token = JWT.sign({ _id: response._id }, process.env.Refresh_JWT_passphrase);
-                // return successful
+
                 return {
                     statusCode: 200,
                     data: user,
@@ -148,14 +164,12 @@ module.exports.login = async (req) => {
                     refresh_token: refresh_token
                 }
             } else {
-                // return with invalid credentials
                 return {
                     statusCode: 401,
-                    message: "Invalid credentials."
+                    message: "The credentials does not match."
                 }
             }
         } else {
-            // return with no account
             return {
                 statusCode: 401,
                 message: "We do not have an account with this email address."
