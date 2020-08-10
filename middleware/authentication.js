@@ -40,7 +40,6 @@ module.exports = async (req, res, next) => {
                         message: "Invaid Payload."
                     });
                 }
-                next();
             } else {
                 res.status(401).json({
                     message: "JWT must be provided."
