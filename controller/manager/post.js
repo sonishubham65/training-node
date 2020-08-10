@@ -1,10 +1,11 @@
 const Post = require('../../models/Post');
 const Application = require('../../models/Application');
 const Joi = require('@hapi/joi');
+const fs = require('fs')
 var mongoose = require('mongoose');
 const ObjectId = mongoose.Types.ObjectId;
 const Schema = {
-    // Schema for a Post
+    // Schema validator for a Single Post
     post: Joi.object({
         project_name: Joi.string()
             .min(3)
@@ -78,7 +79,7 @@ const Schema = {
 
         status: Joi.any().allow('open', 'closed').label("Status").required(),
     }),
-    // Schema for a list post
+    // Schema validator for a getting a list of Posts
     list: Joi.object({
         page: Joi.number()
             .min(1)
@@ -104,14 +105,14 @@ const Schema = {
                 return errors;
             })
     }),
-    // Schema for a post
+    // Schema validator for a getting a single Post
     get: Joi.object({
         _id: Joi.string()
             .alphanum()
             .length(24)
             .label("_id")
     }),
-    //Schema for a List of application
+    //Schema validator for a List of application
     applications: Joi.object({
         page: Joi.number()
             .min(1)
@@ -128,7 +129,7 @@ const Schema = {
             .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net', 'in'] } })
             .label("Email"),
     }),
-    //Schema for a application of a post
+    //Schema validator for getting an application of a post
     application: Joi.object({
         //post Id   
         _id: Joi.string()
@@ -140,22 +141,22 @@ const Schema = {
 }
 
 /**
- * 
- * @param {*} req 
- * @description: This function add a post
+ * @description: This function creates a new post.
+ * With a proper validation of requested data.
+ * Create a new Post.
+ * @returns: It returns statuscode and a successful message.
  */
 module.exports.add = async (req) => {
-    // validation
+    // Validate the requested data
     var { error, value } = await Schema.post.validate(req.body);
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
             errorStack: error.details[0].path
         }
     } else {
-        // Create a post
+        // Create a new post
         let post = await Post.create({
             project_name: value.project_name,
             client_name: value.client_name,
@@ -165,7 +166,6 @@ module.exports.add = async (req) => {
             description: value.description,
             status: value.status,
         });
-        // return successfully
         return {
             statusCode: 201,
             message: "The position has been added successully.",
@@ -177,15 +177,16 @@ module.exports.add = async (req) => {
 }
 
 /**
- * 
- * @param {*} req 
- * @description: This function gets a list of post
+ * @description: This function gets a list of posts.
+ * With a proper validation of requested data.
+ * Count all the available posts.
+ * Gets a list of posts with limit and offset.
+ * @returns: It returns statuscode and a successful message.
  */
 module.exports.list = async (req) => {
-    // validation
+    // Validate the requested data
     var { error, value } = await Schema.list.validate({ ...req.params, ...req.query });
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
@@ -193,23 +194,27 @@ module.exports.list = async (req) => {
         }
     } else {
         let find = { user_id: req.user._id };
-        /**
-         * Filters for _id and project name
-         */
+
+        // Filter for _id
         if (value._id) {
             find._id = value._id;
         }
+
+        // Filter for project name
         if (value.project_name) {
             find.project_name = { $regex: new RegExp(`.*${value.project_name}.*`), $options: "i" }
         }
+
+        // limit and offset
         let limit = 10;
         let skip = (value.page - 1) * limit;
-        //Count the available documents
-        let count = await Post.find(find).countDocuments();
+
+        // Count all the available posts
+        let count = await Post.find(find).sort({ created_at: 'desc' }).countDocuments();
         let posts = [];
         if (count) {
-            //Get the documents
-            posts = await Post.find(find).skip(skip).limit(limit);
+            //Get the list of posts
+            posts = await Post.find(find).sort({ created_at: 'desc' }).skip(skip).limit(limit);
         }
         return {
             statusCode: 200,
@@ -221,15 +226,15 @@ module.exports.list = async (req) => {
     }
 }
 /**
- * 
- * @param {*} req
- * @description: This function gets a post
+ * @description: This function gets a single post.
+ * With a proper validation of requested data.
+ * Gets a single post.
+ * @returns: It returns statuscode and post data.
  */
 module.exports.get = async (req) => {
-    // validation
+    // Validate the requested data
     var { error, value } = await Schema.get.validate({ ...req.params });
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
@@ -254,15 +259,15 @@ module.exports.get = async (req) => {
 }
 
 /**
- * 
- * @param {*} req 
- * @description: This function updates a post
+ * @description: This function updates a post.
+ * With a proper validation of requested parameters and data.
+ * updates a post.
+ * @returns: It returns statuscode and a message as successful.
  */
 module.exports.update = async (req) => {
-    // validation of parameters
+    // Validate the requested parameters
     var { error, value } = await Schema.get.validate(req.params);
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
@@ -270,10 +275,9 @@ module.exports.update = async (req) => {
         }
     } else {
         let params = value;
-        // validation of body
+        // Validate the requested data
         var { error, value } = await Schema.post.validate(req.body);
         if (error) {
-            // return with validation error message
             return {
                 statusCode: 422,
                 message: error.message,
@@ -282,7 +286,8 @@ module.exports.update = async (req) => {
         } else {
             let body = value;
             let where = { user_id: req.user._id, _id: params._id };
-            //update the document
+
+            // update the post
             let response = await Post.updateOne(where, body, { runValidators: true });
             if (response.n > 0) {
                 if (response.nModified) {
@@ -304,16 +309,17 @@ module.exports.update = async (req) => {
         }
     }
 }
+
 /**
- * 
- * @param {*} req 
- * @description: This function updates a post
+ * @description: This function deletes a post.
+ * With a proper validation of requested data.
+ * deletes a post.
+ * @returns: It returns statuscode and a message as successful.
  */
 module.exports.delete = async (req) => {
-    // validation of parameters
+    // Validate the requested data
     var { error, value } = await Schema.get.validate(req.params);
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
@@ -323,7 +329,7 @@ module.exports.delete = async (req) => {
 
         let where = { user_id: req.user._id, _id: value._id };
 
-        //delete the documents
+        // delete the post
         let response = await Post.deleteOne(where);
         if (response.deletedCount) {
             return {
@@ -338,17 +344,16 @@ module.exports.delete = async (req) => {
     }
 }
 
-
 /**
- * 
- * @param {*} req 
- * @description: This function gets a list of application
+ * @description: This function gets a list of application for post.
+ * With a proper validation of requested data.
+ * gets a list of applications and total count of applications for a post.
+ * @returns: It returns statuscode, post details, list of applications and total count of applications.
  */
 module.exports.applications = async (req) => {
-    // validation
+    // Validate the requested data
     var { error, value } = await Schema.applications.validate({ ...req.params, ...req.query });
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
@@ -358,8 +363,9 @@ module.exports.applications = async (req) => {
         let limit = 10;
         let skip = (value.page - 1) * limit;
 
-        //Check if post is related to that manager only
+        //Check if post is related to that user only
         let post = await Post.findOne({ _id: value.post_id, user_id: req.user._id }).select(['project_name', 'client_name', 'created_at', 'status', 'role']);
+
         if (post) {
             // Get applications
             let applications = await Application.find({
@@ -394,15 +400,15 @@ module.exports.applications = async (req) => {
 }
 
 /**
- * 
- * @param {*} req 
- * @description: This function gets an application details for a post 
+ * @description: This function get details of an application.
+ * With a proper validation of requested data.
+ * gets the details of applications.
+ * @returns: It returns statuscode and application details.
  */
 module.exports.application = async (req) => {
-    // validation
+    // Validate the requested data
     var { error, value } = await Schema.application.validate(req.params);
     if (error) {
-        // return with validation error message
         return {
             statusCode: 422,
             message: error.message,
@@ -439,7 +445,7 @@ module.exports.application = async (req) => {
             { $match: { $and: [{ _id: ObjectId(value._id) }, { "post.user_id": ObjectId(req.user._id) }] } },
             { $project: { _id: 1, created_at: 1, user: 1, post: 1 } },
         ])
-        if (application) {
+        if (application.length) {
             return {
                 statusCode: 200,
                 data: application[0]
@@ -448,6 +454,71 @@ module.exports.application = async (req) => {
             return {
                 statusCode: 204
             }
+        }
+
+    }
+}
+
+
+/**
+ * @description: This function downloads resume for an application.
+ * With a proper validation of requested data.
+ * gets the resume details of an applications.
+ * @returns: It downloads the resume.
+ */
+module.exports.resume = async (req, res) => {
+    // Validate the requested data
+    var { error, value } = await Schema.application.validate(req.params);
+    if (error) {
+        res.status(422).json({
+            message: error.message,
+            errorStack: error.details[0].path
+        })
+    } else {
+        let application = await Application.aggregate([
+            {
+                $lookup: {
+                    from: "users",
+                    let: { userid: "$user_id" },
+                    pipeline: [{
+                        $match: { $expr: { $eq: ["$_id", { $toObjectId: "$$userid" }] } }
+                    }, {
+                        $project: { _id: 0, name: 1, email: 1, resume: { originalname: 1, filename: 1 } }
+                    }],
+                    as: 'user',
+                },
+            },
+            { $unwind: "$user" },
+            {
+                $lookup: {
+                    from: "posts",
+                    let: { userid: "$user_id", postid: "$post_id" },
+                    pipeline: [{
+                        $match: {
+                            $expr: { $eq: ["$_id", { $toObjectId: "$$postid" }] }
+                        }
+                    }],
+                    as: 'post',
+                },
+            },
+            { $unwind: "$post" },
+            { $match: { $and: [{ _id: ObjectId(value._id) }, { "post.user_id": ObjectId(req.user._id) }] } },
+            { $project: { _id: 1, created_at: 1, user: 1, post: 1 } },
+        ])
+        if (application.length) {
+            let resume = application[0].user.resume;
+            if (resume) {
+                var filestream = fs.createReadStream(`./public/resumes/${resume.filename}`);
+                res.setHeader('Content-disposition', 'attachment; filename=' + resume.originalname);
+                filestream.pipe(res)
+            } else {
+                res.status(500).json({
+                    message: "Resume not found."
+                });
+            }
+
+        } else {
+            res.status(204);
         }
 
     }
