@@ -139,8 +139,7 @@ module.exports.login = async (req) => {
         }
     } else {
         // Gets the user for the email address
-        var user = await User.findOne({ email: value.email }).select('_id', '+password');
-        console.log(user)
+        var user = await User.findOne({ email: value.email }).select('+password');
         if (user) {
             // Compare the password
             let result = await bcrypt.compare(value.password, user.password);
@@ -186,7 +185,6 @@ module.exports.login = async (req) => {
  */
 module.exports.authorize = async (req) => {
     let refresh_token = req.cookies.refresh_token;
-    console.log(refresh_token);
     if (!refresh_token) {
         // return with validation error message
         return {
