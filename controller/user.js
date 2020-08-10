@@ -187,7 +187,6 @@ module.exports.login = async (req) => {
 module.exports.authorize = async (req) => {
     let refresh_token = req.cookies.refresh_token;
     if (!refresh_token) {
-        // return with validation error message
         return {
             statusCode: 400,
             message: "Refresh token missing."
