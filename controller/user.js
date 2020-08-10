@@ -122,11 +122,11 @@ const loginSchema = Joi.object({
 });
 
 /**
- * @description: This function logins a new user.
+ * @description: This function logins a user.
  * With a proper validation of requested data.
- * Checks with duplicate email entries.
- * Create a hash for password and create a new user.
- * @returns: It returns statuscode and a message as successful.
+ * Checks with email entries.
+ * Create access token and refresh token.
+ * @returns: It returns statuscode userdata and token.
  */
 module.exports.login = async (req) => {
     // Validate the requested data
