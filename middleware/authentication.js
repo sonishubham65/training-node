@@ -22,8 +22,24 @@ module.exports = async (req, res, next) => {
             if (token) {
                 // Verify and parse access token.
                 let result = JWT.verify(token, process.env.JWT_passphrase);
-                // Save user information in request variable for further use.
-                req.user = result;
+
+                // Get the user and check its status
+                let user = await User.findById(result._id);
+                if (user) {
+                    if (user.status == 'active') {
+                        // Save user information in request variable for further use.
+                        req.user = user;
+                        next();
+                    } else {
+                        res.status(401).json({
+                            message: "The user status has been inactive."
+                        });
+                    }
+                } else {
+                    res.status(401).json({
+                        message: "Invaid Payload."
+                    });
+                }
                 next();
             } else {
                 res.status(401).json({
