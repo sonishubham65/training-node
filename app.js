@@ -41,7 +41,7 @@ app.use(function (err, req, res, next) {
  * Database connection with mongoose
  */
 const mongoose = require('mongoose');
-mongoose.connect(`${process.env.DBURI}/${process.env.DBNAME}`, { useNewUrlParser: true, useUnifiedTopology: true });
+mongoose.connect(`${process.env.DBURI}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
 app.listen(process.env.PORT, () => {
   console.log(`Server is started on ${process.env.ENVIRONMENT}`);
