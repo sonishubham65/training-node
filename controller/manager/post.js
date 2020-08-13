@@ -222,7 +222,7 @@ module.exports.list = async (req) => {
             statusCode: 200,
             data: {
                 posts: posts,
-                totalPages: Math.ceil(count / limit)
+                total: count
             }
         }
     }
@@ -391,7 +391,7 @@ module.exports.applications = async (req) => {
                 data: {
                     post: post,
                     applications: applications,
-                    totalPages: Math.ceil(total / limit)
+                    total: total
                 }
             }
         } else {
