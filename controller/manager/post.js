@@ -214,7 +214,9 @@ module.exports.list = async (req) => {
         let posts = [];
         if (count) {
             //Get the list of posts
-            posts = await Post.find(find).sort({ created_at: 'desc' }).skip(skip).limit(limit);
+            posts = await Post.find(find).select([
+                "project_name", "client_name", "created_at", "updated_at", "status", "role"
+            ]).sort({ _id: 'desc' }).skip(skip).limit(limit);
         }
         return {
             statusCode: 200,
@@ -285,6 +287,7 @@ module.exports.update = async (req) => {
             }
         } else {
             let body = value;
+            body.updated_at = new Date();
             let where = { user_id: req.user._id, _id: params._id };
 
             // update the post
