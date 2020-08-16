@@ -48,7 +48,7 @@ module.exports = async (req, res, next) => {
         }
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 }
