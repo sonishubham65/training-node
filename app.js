@@ -22,7 +22,7 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', require('./routes/index'));
-router.use('/user', require('./user'));
+app.use('/user', require('./routes/user'));
 app.use('/employee/', require('./routes/employee/'));
 app.use('/manager/', require('./routes/manager/'));
 
