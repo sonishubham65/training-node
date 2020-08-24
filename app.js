@@ -6,9 +6,11 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cors = require('cors')
 var app = express();
-app.use(cors())
-
-
+app.use(cors({
+  origin: process.env.ALLOWED_AUTH_ORIGIN,
+  path: 'user/authorize',
+  credentials: true
+}))
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -20,7 +22,6 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', require('./routes/index'));
-app.use('/user', require('./routes/user'));
 app.use('/employee/', require('./routes/employee/'));
 app.use('/manager/', require('./routes/manager/'));
 
