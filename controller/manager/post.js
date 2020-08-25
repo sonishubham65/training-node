@@ -12,7 +12,7 @@ const Schema = {
             .max(60)
             .label("Project name")
             .required()
-            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
             .error(errors => {
                 errors.forEach(error => {
                     switch (error.code) {
@@ -28,7 +28,7 @@ const Schema = {
             .max(30)
             .label("Client name")
             .required()
-            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
             .error(errors => {
                 errors.forEach(error => {
                     switch (error.code) {
@@ -45,7 +45,7 @@ const Schema = {
                 .max(50)
                 .label("Technology")
                 .required()
-                .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+                .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
                 .error(errors => {
                     errors.forEach(error => {
                         switch (error.code) {
@@ -58,6 +58,17 @@ const Schema = {
                 })
         )
             .label("Technologies")
+            .error(errors => {
+                errors.forEach(error => {
+                    console.log(error.code)
+                    switch (error.code) {
+                        case 'array.includesRequiredKnowns': {
+                            error.message = 'Technologies must contains at least one input.';
+                        } break;
+                    }
+                })
+                return errors;
+            })
             .required(),
         role: Joi.any().valid('trainee', 'associate', 'senior_associate', 'lead', 'manager', 'director').label("Role").required(),
         description: Joi.string()
@@ -65,12 +76,13 @@ const Schema = {
             .max(1000)
             .label("Description")
             .required()
-            .pattern(new RegExp(/^[A-Z a-z 0-9.'-@# ,?"*&]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.'# ,?"*&-]+$/))
             .error(errors => {
+                console.log(errors)
                 errors.forEach(error => {
                     switch (error.code) {
                         case 'string.pattern.base': {
-                            error.message = '"Description" should contain letters and number only';
+                            error.message = '"Description" should contain letters, number and .\'-@# ,?*& only';
                         } break;
                     }
                 })
@@ -93,7 +105,7 @@ const Schema = {
             .min(3)
             .max(60)
             .label("Project name")
-            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
             .error(errors => {
                 errors.forEach(error => {
                     switch (error.code) {

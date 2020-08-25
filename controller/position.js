@@ -18,7 +18,7 @@ const Schema = {
             .min(3)
             .max(60)
             .label("Project name")
-            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
             .error(errors => {
                 errors.forEach(error => {
                     switch (error.code) {
