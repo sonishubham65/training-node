@@ -138,9 +138,8 @@ describe("Manager, Post Crud operations API", () => {
                     if (response.body.data.posts.length > 0) {
                         for (let i = 0; i < response.body.data.posts.length; i++) {
                             let post = response.body.data.posts[i];
-                            expect(post).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
-                            expect(post.technologies).to.be.an("array");
-                            expect(new Date(post.created_at)).to.be.an.a("date");
+                            expect(post).to.contain.all.keys("role", "status", "_id", "project_name", "client_name", "created_at");
+                            expect(new Date(post.created_at)).to.be.a("date");
                         }
                     }
                     done();
@@ -161,7 +160,7 @@ describe("Manager, Post Crud operations API", () => {
                         let post = response.body.data.posts[0];
                         expect(post).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
                         expect(post.technologies).to.be.an("array");
-                        expect(new Date(post.created_at)).to.be.an.a("date");
+                        expect(new Date(post.created_at)).to.be.a("date");
                     }
                     done();
                 }).catch(err => {
