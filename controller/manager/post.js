@@ -76,7 +76,7 @@ const Schema = {
             .max(1000)
             .label("Description")
             .required()
-            .pattern(new RegExp(/^[A-Z a-z 0-9.'# ,?"*&-]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.'# ,?"*&\r\t\n-]+$/))
             .error(errors => {
                 console.log(errors)
                 errors.forEach(error => {
