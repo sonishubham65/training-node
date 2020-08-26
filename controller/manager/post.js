@@ -525,7 +525,8 @@ module.exports.resume = async (req, res) => {
             if (resume) {
                 var filestream = fs.createReadStream(`./public/resumes/${resume.filename}`);
                 res.setHeader('Content-disposition', 'attachment; filename=' + resume.originalname);
-                filestream.pipe(res)
+                res.setHeader('Access-Control-Expose-Headers', 'Content-disposition');
+                filestream.pipe(res);
             } else {
                 res.status(500).json({
                     message: "Resume not found."
