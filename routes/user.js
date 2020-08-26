@@ -25,7 +25,7 @@ router.post('/login', async (req, res, next) => {
     if (response.refresh_token) {
       res.cookie("refresh_token", response.refresh_token, {
         expires: new Date(Date.now() + 99999999),
-        httpOnly: false
+        httpOnly: true
       });
     }
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data, token: response.token })
