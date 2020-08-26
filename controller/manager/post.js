@@ -408,7 +408,7 @@ module.exports.applications = async (req) => {
             }
         } else {
             return {
-                statsuCode: 204
+                statusCode: 204
             }
         }
     }
