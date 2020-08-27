@@ -75,7 +75,7 @@ module.exports.list = async (req) => {
         if (count) {
 
             //Get the documents
-            posts = await Post.find(find).skip(skip).limit(limit);
+            posts = await Post.find(find).sort({ _id: -1 }).skip(skip).limit(limit);
         }
         return {
             statusCode: 200,
