@@ -21,6 +21,7 @@ var postSchema = new Schema({
         default: 'open'
     },
     created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date },
 });
 
 module.exports = mongoose.model('Post', postSchema);

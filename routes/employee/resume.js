@@ -12,7 +12,7 @@ router.put('/', async (req, res, next) => {
     } catch (e) {
         console.log(e)
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -25,7 +25,7 @@ router.get('/', async (req, res, next) => {
         await resume.download(req, res);
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });

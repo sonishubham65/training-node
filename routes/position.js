@@ -13,7 +13,7 @@ router.get('/page/:page', async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -27,7 +27,7 @@ router.get('/:_id', async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -41,7 +41,7 @@ router.post('/apply/:_id', authorization.employee, async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });

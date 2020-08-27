@@ -13,7 +13,7 @@ router.post('/', async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -28,7 +28,7 @@ router.get('/page/:page', async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -43,7 +43,7 @@ router.get('/:_id', async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -58,7 +58,7 @@ router.patch('/:_id', async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -73,7 +73,7 @@ router.delete('/:_id', async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -88,7 +88,7 @@ router.get('/:post_id/application/page/:page', async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -103,7 +103,7 @@ router.get('/application/details/:_id', async (req, res, next) => {
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });
@@ -116,7 +116,7 @@ router.get('/application/resume/:_id', async (req, res, next) => {
         await post.resume(req, res);
     } catch (e) {
         res.status(500).json({
-            messag: e.message
+            message: e.message
         })
     }
 });

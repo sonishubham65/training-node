@@ -43,7 +43,7 @@ describe("Employee Position API", () => {
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).that.has.property("data");
-                    expect(response.body.data).to.contain.all.keys("posts", "totalPages");
+                    expect(response.body.data).to.contain.all.keys("posts", "total");
                     expect(response.body.data.posts).to.be.an("array");
                     if (response.body.data.posts.length > 0) {
                         response.body.data.posts.forEach(post => {
@@ -51,7 +51,7 @@ describe("Employee Position API", () => {
                             expect(post.technologies).to.be.an('array');
                         })
                     }
-                    expect(response.body.data.totalPages).to.be.a("number");
+                    expect(response.body.data.total).to.be.a("number");
                     done();
                 }).catch(err => {
                     done(err)

@@ -133,14 +133,13 @@ describe("Manager, Post Crud operations API", () => {
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
-                    expect(response.body.data).to.contain.all.keys("posts", "totalPages");
-                    expect(response.body.data.totalPages).to.be.a("number");
+                    expect(response.body.data).to.contain.all.keys("posts", "total");
+                    expect(response.body.data.total).to.be.a("number");
                     if (response.body.data.posts.length > 0) {
                         for (let i = 0; i < response.body.data.posts.length; i++) {
                             let post = response.body.data.posts[i];
-                            expect(post).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
-                            expect(post.technologies).to.be.an("array");
-                            expect(new Date(post.created_at)).to.be.an.a("date");
+                            expect(post).to.contain.all.keys("role", "status", "_id", "project_name", "client_name", "created_at");
+                            expect(new Date(post.created_at)).to.be.a("date");
                         }
                     }
                     done();
@@ -155,13 +154,13 @@ describe("Manager, Post Crud operations API", () => {
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
-                    expect(response.body.data).to.contain.all.keys("posts", "totalPages");
-                    expect(response.body.data.totalPages).to.be.a("number");
+                    expect(response.body.data).to.contain.all.keys("posts", "total");
+                    expect(response.body.data.total).to.be.a("number");
                     if (response.body.data.posts.length == 1) {
                         let post = response.body.data.posts[0];
                         expect(post).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
                         expect(post.technologies).to.be.an("array");
-                        expect(new Date(post.created_at)).to.be.an.a("date");
+                        expect(new Date(post.created_at)).to.be.a("date");
                     }
                     done();
                 }).catch(err => {
@@ -175,8 +174,8 @@ describe("Manager, Post Crud operations API", () => {
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).to.be.an('object').that.has.property('data');
-                    expect(response.body.data).to.contain.all.keys("posts", "totalPages");
-                    expect(response.body.data.totalPages).to.be.a("number");
+                    expect(response.body.data).to.contain.all.keys("posts", "total");
+                    expect(response.body.data.total).to.be.a("number");
                     expect(response.body.data.posts).to.be.an("array");
                     expect(response.body.data.posts.length).to.be.equal(0);
                     done();

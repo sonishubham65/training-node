@@ -14,7 +14,7 @@ router.post('/signup', async (req, res, next) => {
   } catch (e) {
     //Handle all the uncaught errors.
     res.status(500).json({
-      messag: e.message
+      message: e.message
     })
   }
 });
@@ -24,14 +24,14 @@ router.post('/login', async (req, res, next) => {
     let response = await user.login(req);
     if (response.refresh_token) {
       res.cookie("refresh_token", response.refresh_token, {
-        expires: new Date(Date.now() + 9999999),
+        expires: new Date(Date.now() + 99999999),
         httpOnly: true
       });
     }
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data, token: response.token })
   } catch (e) {
     res.status(500).json({
-      messag: e.message
+      message: e.message
     })
   }
 });
@@ -42,7 +42,7 @@ router.get('/authorize', async (req, res, next) => {
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data, token: response.token })
   } catch (e) {
     res.status(500).json({
-      messag: e.message
+      message: e.message
     })
   }
 });
