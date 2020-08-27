@@ -81,7 +81,7 @@ module.exports.list = async (req) => {
             statusCode: 200,
             data: {
                 posts: posts,
-                total: Math.ceil(count / limit)
+                total: count
             }
         }
     }
