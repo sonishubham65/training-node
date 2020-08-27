@@ -388,7 +388,7 @@ module.exports.applications = async (req) => {
             }).populate({
                 path: 'user_id',
                 select: { name: 1, email: 1, _id: 0 }
-            }).select({ post_id: 0 }).limit(limit).skip(skip);
+            }).select({ post_id: 0 }).sort({ _id: -1 }).limit(limit).skip(skip);
 
             // Get applications count
             let total = await Application.find({
