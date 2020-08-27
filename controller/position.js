@@ -66,7 +66,7 @@ module.exports.list = async (req) => {
         }
 
         // Limits and offset
-        let limit = 2;
+        let limit = 10;
         let skip = (value.page - 1) * limit;
 
         //Count the available documents
