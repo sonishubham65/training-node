@@ -2,7 +2,7 @@ var express = require('express');
 var router = express.Router();
 
 const user = require('../controller/user');
-
+const authentication = require('../middleware/authentication');
 /**
  * @description: This route defines the route path for Signup api.
  * @returns: It returns http status as 200 and a message as successful.
@@ -29,6 +29,17 @@ router.post('/login', async (req, res, next) => {
       });
     }
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data, token: response.token })
+  } catch (e) {
+    res.status(500).json({
+      message: e.message
+    })
+  }
+});
+
+router.get('/profile', authentication, async (req, res, next) => {
+  try {
+    let response = await user.profile(req);
+    res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
   } catch (e) {
     res.status(500).json({
       message: e.message

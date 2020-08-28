@@ -198,17 +198,27 @@ module.exports.apply = async (req) => {
                 message: "You have already applied for this position."
             }
         } else {
-            let application = await Application.create({ post_id: value._id, user_id: req.user.id, status: 'applied' });
-            if (application._id) {
-                return {
-                    statusCode: 201,
-                    message: "Thank you for applying on this position."
+            //Check if post is activated
+            let post = await Post.findOne({ _id: value._id, status: 'open' })
+            if (post) {
+                let application = await Application.create({ post_id: value._id, user_id: req.user.id, status: 'applied' });
+                if (application._id) {
+                    return {
+                        statusCode: 201,
+                        message: "Thank you for applying on this position."
+                    }
+                } else {
+                    return {
+                        statusCode: 204
+                    }
                 }
             } else {
                 return {
-                    statusCode: 204
+                    statusCode: 500,
+                    message: "The position is not activated."
                 }
             }
+
         }
 
     }

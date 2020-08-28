@@ -156,11 +156,8 @@ module.exports.login = async (req) => {
 
                 // Create a refresh token
                 var refresh_token = JWT.sign({ _id: response._id }, process.env.Refresh_JWT_passphrase);
-                // Remove password field from user data
-                user.password = undefined;
                 return {
                     statusCode: 200,
-                    data: user,
                     token: token,
                     refresh_token: refresh_token
                 }
@@ -176,6 +173,18 @@ module.exports.login = async (req) => {
                 message: "We do not have an account with this email address."
             }
         }
+    }
+}
+/**
+ * @description: This function gives profile of a user.
+ * @returns: It returns statuscode and userdata.
+ */
+module.exports.profile = async (req) => {
+    // Gets the user for the email address
+    var user = await User.findOne({ _id: req.user._id }).select('+password');
+    return {
+        data: user,
+        statusCode: 200
     }
 }
 
