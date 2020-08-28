@@ -101,6 +101,7 @@ module.exports.download = async (req, res) => {
     if (response.resume) {
         var filestream = fs.createReadStream(`./public/resumes/${response.resume.filename}`);
         res.setHeader('Content-disposition', 'attachment; filename=' + response.resume.originalname);
+        res.setHeader('Access-Control-Expose-Headers', 'Content-disposition');
         filestream.pipe(res)
     } else {
         res.status(404).json({ message: "You have not updated resume yet." })
