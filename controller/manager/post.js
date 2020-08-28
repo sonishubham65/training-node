@@ -70,7 +70,7 @@ const Schema = {
                 return errors;
             })
             .required(),
-        role: Joi.any().valid('trainee', 'associate', 'senior_associate', 'lead', 'manager', 'director').label("Role").required(),
+        role: Joi.any().valid('Trainee', 'Associate', 'Senior associate', 'Lead', 'Manager', 'Director').label("Role").required(),
         description: Joi.string()
             .min(100)
             .max(1000)

@@ -11,8 +11,8 @@ var postSchema = new Schema({
     },
     role: {
         type: String,
-        enum: ['trainee', 'associate', 'senior_associate', 'lead', 'manager', 'director'],
-        default: 'trainee'
+        enum: ['Trainee', 'Associate', 'Senior associate', 'Lead', 'Manager', 'Director'],
+        default: 'Trainee'
     },
     description: String,
     status: {
