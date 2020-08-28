@@ -4,9 +4,15 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
-
+var cors = require('cors')
 var app = express();
-
+app.use(cors({
+  //origin: process.env.ALLOWED_AUTH_ORIGIN,
+  origin: true,
+  path: ['user/login', 'user/login'],
+  credentials: true,
+  maxAge: 3600
+}))
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');

@@ -11,8 +11,8 @@ var postSchema = new Schema({
     },
     role: {
         type: String,
-        enum: ['trainee', 'associate', 'senior_associate', 'lead', 'manager', 'director'],
-        default: 'trainee'
+        enum: ['Trainee', 'Associate', 'Senior associate', 'Lead', 'Manager', 'Director'],
+        default: 'Trainee'
     },
     description: String,
     status: {
@@ -21,6 +21,7 @@ var postSchema = new Schema({
         default: 'open'
     },
     created_at: { type: Date, default: Date.now },
+    updated_at: { type: Date },
 });
 
 module.exports = mongoose.model('Post', postSchema);

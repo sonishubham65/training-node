@@ -45,7 +45,7 @@ describe("Manager Application API", () => {
                 .then((response) => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).that.has.property("data");
-                    expect(response.body.data).to.contain.all.keys("post", "applications", "totalPages");
+                    expect(response.body.data).to.contain.all.keys("post", "applications", "total");
                     expect(response.body.data.post).to.be.an("object");
                     expect(response.body.data.post).to.contain.all.keys('project_name', 'client_name', 'created_at', 'status', 'role');
                     expect(response.body.data.applications).to.be.an("array");
@@ -57,7 +57,7 @@ describe("Manager Application API", () => {
                             expect(application.user_id).to.contain.all.keys("name", "email");
                         })
                     }
-                    expect(response.body.data.totalPages).to.be.a("number");
+                    expect(response.body.data.total).to.be.a("number");
                     done();
                 }).catch(err => {
                     done(err)

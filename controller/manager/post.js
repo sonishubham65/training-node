@@ -12,7 +12,7 @@ const Schema = {
             .max(60)
             .label("Project name")
             .required()
-            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
             .error(errors => {
                 errors.forEach(error => {
                     switch (error.code) {
@@ -28,7 +28,7 @@ const Schema = {
             .max(30)
             .label("Client name")
             .required()
-            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
             .error(errors => {
                 errors.forEach(error => {
                     switch (error.code) {
@@ -45,7 +45,7 @@ const Schema = {
                 .max(50)
                 .label("Technology")
                 .required()
-                .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+                .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
                 .error(errors => {
                     errors.forEach(error => {
                         switch (error.code) {
@@ -58,19 +58,31 @@ const Schema = {
                 })
         )
             .label("Technologies")
+            .error(errors => {
+                errors.forEach(error => {
+                    console.log(error.code)
+                    switch (error.code) {
+                        case 'array.includesRequiredKnowns': {
+                            error.message = 'Technologies must contains at least one input.';
+                        } break;
+                    }
+                })
+                return errors;
+            })
             .required(),
-        role: Joi.any().valid('trainee', 'associate', 'senior_associate', 'lead', 'manager', 'director').label("Role").required(),
+        role: Joi.any().valid('Trainee', 'Associate', 'Senior associate', 'Lead', 'Manager', 'Director').label("Role").required(),
         description: Joi.string()
             .min(100)
             .max(1000)
             .label("Description")
             .required()
-            .pattern(new RegExp(/^[A-Z a-z 0-9.'-@# ,?"*&]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.'# ,?"*&\r\t\n-]+$/))
             .error(errors => {
+                console.log(errors)
                 errors.forEach(error => {
                     switch (error.code) {
                         case 'string.pattern.base': {
-                            error.message = '"Description" should contain letters and number only';
+                            error.message = '"Description" should contain letters, number and .\'-@# ,?*& only';
                         } break;
                     }
                 })
@@ -93,7 +105,7 @@ const Schema = {
             .min(3)
             .max(60)
             .label("Project name")
-            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
             .error(errors => {
                 errors.forEach(error => {
                     switch (error.code) {
@@ -214,13 +226,15 @@ module.exports.list = async (req) => {
         let posts = [];
         if (count) {
             //Get the list of posts
-            posts = await Post.find(find).sort({ created_at: 'desc' }).skip(skip).limit(limit);
+            posts = await Post.find(find).select([
+                "project_name", "client_name", "created_at", "updated_at", "status", "role"
+            ]).sort({ _id: 'desc' }).skip(skip).limit(limit);
         }
         return {
             statusCode: 200,
             data: {
                 posts: posts,
-                totalPages: Math.ceil(count / limit)
+                total: count
             }
         }
     }
@@ -285,6 +299,7 @@ module.exports.update = async (req) => {
             }
         } else {
             let body = value;
+            body.updated_at = new Date();
             let where = { user_id: req.user._id, _id: params._id };
 
             // update the post
@@ -373,7 +388,7 @@ module.exports.applications = async (req) => {
             }).populate({
                 path: 'user_id',
                 select: { name: 1, email: 1, _id: 0 }
-            }).select({ post_id: 0 }).limit(limit).skip(skip);
+            }).select({ post_id: 0 }).sort({ _id: -1 }).limit(limit).skip(skip);
 
             // Get applications count
             let total = await Application.find({
@@ -388,12 +403,12 @@ module.exports.applications = async (req) => {
                 data: {
                     post: post,
                     applications: applications,
-                    totalPages: Math.ceil(total / limit)
+                    total: total
                 }
             }
         } else {
             return {
-                statsuCode: 204
+                statusCode: 204
             }
         }
     }
@@ -510,7 +525,8 @@ module.exports.resume = async (req, res) => {
             if (resume) {
                 var filestream = fs.createReadStream(`./public/resumes/${resume.filename}`);
                 res.setHeader('Content-disposition', 'attachment; filename=' + resume.originalname);
-                filestream.pipe(res)
+                res.setHeader('Access-Control-Expose-Headers', 'Content-disposition');
+                filestream.pipe(res);
             } else {
                 res.status(500).json({
                     message: "Resume not found."

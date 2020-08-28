@@ -18,7 +18,7 @@ const Schema = {
             .min(3)
             .max(60)
             .label("Project name")
-            .pattern(new RegExp(/^[A-Z a-z 0-9.&-'$()]+$/))
+            .pattern(new RegExp(/^[A-Z a-z 0-9.&'$()-]+$/))
             .error(errors => {
                 errors.forEach(error => {
                     switch (error.code) {
@@ -66,7 +66,7 @@ module.exports.list = async (req) => {
         }
 
         // Limits and offset
-        let limit = 2;
+        let limit = 10;
         let skip = (value.page - 1) * limit;
 
         //Count the available documents
@@ -75,13 +75,13 @@ module.exports.list = async (req) => {
         if (count) {
 
             //Get the documents
-            posts = await Post.find(find).skip(skip).limit(limit);
+            posts = await Post.find(find).sort({ _id: -1 }).skip(skip).limit(limit);
         }
         return {
             statusCode: 200,
             data: {
                 posts: posts,
-                totalPages: Math.ceil(count / limit)
+                total: count
             }
         }
     }
@@ -198,17 +198,27 @@ module.exports.apply = async (req) => {
                 message: "You have already applied for this position."
             }
         } else {
-            let application = await Application.create({ post_id: value._id, user_id: req.user.id, status: 'applied' });
-            if (application._id) {
-                return {
-                    statusCode: 201,
-                    message: "Thank you for applying on this position."
+            //Check if post is activated
+            let post = await Post.findOne({ _id: value._id, status: 'open' })
+            if (post) {
+                let application = await Application.create({ post_id: value._id, user_id: req.user.id, status: 'applied' });
+                if (application._id) {
+                    return {
+                        statusCode: 201,
+                        message: "Thank you for applying on this position."
+                    }
+                } else {
+                    return {
+                        statusCode: 204
+                    }
                 }
             } else {
                 return {
-                    statusCode: 204
+                    statusCode: 500,
+                    message: "The position is not activated."
                 }
             }
+
         }
 
     }
