@@ -70,12 +70,32 @@ setInterval(() => {
   }
 
 }, 1000);
-
+const Socket = require('./models/Socket');
+const JWT = require('jsonwebtoken');
 io.on('connection', (socket) => {
-  console.log(`a new user connected.`, socket.id);
-  socket.on('disconnect', () => {
-    console.log("User disconnected.", socket.id);
-  })
+  try {
+    let token = socket.handshake.query.token;
+    if (token.trim() != 'undefined') {
+      let result = JWT.verify(token, process.env.JWT_passphrase);
+      console.log(result)
+      Socket.create({
+        user_id: result._id,
+        socket_id: socket.id
+      });
+    }
+    console.log(`a new user connected.`, socket.id);
+    socket.on('disconnect', () => {
+      console.log("User disconnected.", socket.id);
+      Socket.deleteOne({
+        socket_id: socket.id
+      }).then((data) => {
+        console.log(data)
+      });
+    })
+  } catch (e) {
+    console.log(e.message)
+  }
+
 });
 
 module.exports = app;
