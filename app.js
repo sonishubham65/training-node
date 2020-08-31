@@ -56,22 +56,25 @@ http.listen(process.env.PORT, () => {
   console.log(`Server is started on ${process.env.ENVIRONMENT}`);
 })
 let colors = ['#F43109', '#09B9F4', '#DF09F4', '#0AF409', '#F4F309']
+let i = 0;
 setInterval(() => {
+  i++;
   let random = Math.floor(Math.random() * ((colors.length - 1) - 0 + 1)) + 0
   let dateObj = new Date();
-  let dateTime = `${dateObj.getHours()}:${dateObj.getMinutes()}:${dateObj.getSeconds()} ${dateObj.getDate()}-${dateObj.getMonth()}-${dateObj.getFullYear()}`
-  let message = {
-    time: dateTime,
-    color: colors[random]
-  };
-  io.to('timer').emit("watch", message)
+  let dateTime = `
+  ${dateObj.getHours().toString().padStart(2, 0)}:${dateObj.getMinutes().toString().padStart(2, 0)}:${dateObj.getSeconds().toString().padStart(2, 0)} ${dateObj.getDate().toString().padStart(2, 0)}-${dateObj.getMonth().toString().padStart(2, 0)}-${dateObj.getFullYear().toString()}`
+
+  io.of('/').emit('timer', dateTime);
+  if (i % 5 == 0) {
+    io.of('/').emit('color', colors[random]);
+  }
+
 }, 1000);
 
 io.on('connection', (socket) => {
-  console.log('a user connected', socket.id);
-  socket.join('timer');
+  console.log(`a new user connected.`, socket.id);
   socket.on('disconnect', () => {
-    console.log("disconnect.", socket.id);
+    console.log("User disconnected.", socket.id);
   })
 });
 
