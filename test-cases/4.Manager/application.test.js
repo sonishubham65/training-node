@@ -52,9 +52,9 @@ describe("Manager Application API", () => {
                     if (response.body.data.applications.length > 0) {
                         response.body.data.applications.forEach(application => {
                             config.application_id = application._id;
-                            expect(application).to.contain.all.keys("_id", "user_id", "created_at");
-                            expect(application.user_id).to.be.an("object");
-                            expect(application.user_id).to.contain.all.keys("name", "email");
+                            expect(application).to.contain.all.keys("_id", "user_id", 'status', "created_at");
+                            expect(application.user).to.be.an("object");
+                            expect(application.user).to.contain.all.keys("name", "email");
                         })
                     }
                     expect(response.body.data.total).to.be.a("number");

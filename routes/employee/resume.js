@@ -10,7 +10,6 @@ router.put('/', async (req, res, next) => {
         let response = await resume.update(req, res);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
-        console.log(e)
         res.status(500).json({
             message: e.message
         })
