@@ -543,7 +543,7 @@ module.exports.resume = async (req, res) => {
                 filestream.pipe(res);
             } else {
                 res.status(500).json({
-                    message: "Resume not found."
+                    message: "Resume not available."
                 });
             }
 
