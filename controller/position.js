@@ -3,6 +3,7 @@ const ObjectId = mongoose.Types.ObjectId;
 const Post = require('../models/Post');
 const Application = require('../models/Application');
 const Joi = require('@hapi/joi');
+const Socket = require('../models/Socket');
 const Schema = {
     // Schema validator for a Positions listing
     list: Joi.object({
@@ -153,7 +154,6 @@ module.exports.get = async (req) => {
             },
             { $unwind: '$user' }
         ])
-        console.log(post)
         if (post.length) {
             post = post[0];
             if (post.application.length) {
@@ -202,7 +202,15 @@ module.exports.apply = async (req) => {
             let post = await Post.findOne({ _id: value._id, status: 'open' })
             if (post) {
                 let application = await Application.create({ post_id: value._id, user_id: req.user.id, status: 'applied' });
+
                 if (application._id) {
+                    let socket = await Socket.findOne({
+                        user_id: post.user_id
+                    }).sort({ _id: -1 })
+                    console.log(socket.socket_id)
+                    if (socket.socket_id) {
+                        io.to(socket.socket_id).emit('application', { id: application._id })
+                    }
                     return {
                         statusCode: 201,
                         message: "Thank you for applying on this position."

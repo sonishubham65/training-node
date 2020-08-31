@@ -50,7 +50,7 @@ const mongoose = require('mongoose');
 mongoose.connect(`${process.env.DBURI}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
 var http = require('http').createServer(app);
-var io = require('socket.io')(http);
+global.io = require('socket.io')(http);
 
 http.listen(process.env.PORT, () => {
   console.log(`Server is started on ${process.env.ENVIRONMENT}`);
@@ -77,7 +77,6 @@ io.on('connection', (socket) => {
     let token = socket.handshake.query.token;
     if (token.trim() != 'undefined') {
       let result = JWT.verify(token, process.env.JWT_passphrase);
-      console.log(result)
       Socket.create({
         user_id: result._id,
         socket_id: socket.id
@@ -89,7 +88,7 @@ io.on('connection', (socket) => {
       Socket.deleteOne({
         socket_id: socket.id
       }).then((data) => {
-        console.log(data)
+
       });
     })
   } catch (e) {

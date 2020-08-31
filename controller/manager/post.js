@@ -60,7 +60,6 @@ const Schema = {
             .label("Technologies")
             .error(errors => {
                 errors.forEach(error => {
-                    console.log(error.code)
                     switch (error.code) {
                         case 'array.includesRequiredKnowns': {
                             error.message = 'Technologies must contains at least one input.';
@@ -78,7 +77,6 @@ const Schema = {
             .required()
             .pattern(new RegExp(/^[A-Z a-z 0-9.'# ,?"*&\r\t\n-]+$/))
             .error(errors => {
-                console.log(errors)
                 errors.forEach(error => {
                     switch (error.code) {
                         case 'string.pattern.base': {
