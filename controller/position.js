@@ -204,10 +204,11 @@ module.exports.apply = async (req) => {
                 let application = await Application.create({ post_id: value._id, user_id: req.user.id, status: 'applied' });
 
                 if (application._id) {
+                    //Push notification to post owner
                     let socket = await Socket.findOne({
                         user_id: post.user_id
                     }).sort({ _id: -1 })
-                    console.log(socket.socket_id)
+
                     if (socket.socket_id) {
                         io.to(socket.socket_id).emit('application', { id: application._id })
                     }
