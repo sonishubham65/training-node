@@ -49,8 +49,33 @@ app.use(function (err, req, res, next) {
 const mongoose = require('mongoose');
 mongoose.connect(`${process.env.DBURI}`, { useNewUrlParser: true, useUnifiedTopology: true });
 
-app.listen(process.env.PORT, () => {
+var http = require('http').createServer(app);
+var io = require('socket.io')(http);
+
+http.listen(process.env.PORT, () => {
   console.log(`Server is started on ${process.env.ENVIRONMENT}`);
 })
+let colors = ['#F43109', '#09B9F4', '#DF09F4', '#0AF409', '#F4F309']
+let i = 0;
+setInterval(() => {
+  i++;
+  let random = Math.floor(Math.random() * ((colors.length - 1) - 0 + 1)) + 0
+  let dateObj = new Date();
+  let dateTime = `
+  ${dateObj.getHours().toString().padStart(2, 0)}:${dateObj.getMinutes().toString().padStart(2, 0)}:${dateObj.getSeconds().toString().padStart(2, 0)} ${dateObj.getDate().toString().padStart(2, 0)}-${dateObj.getMonth().toString().padStart(2, 0)}-${dateObj.getFullYear().toString()}`
+
+  io.of('/').emit('timer', dateTime);
+  if (i % 5 == 0) {
+    io.of('/').emit('color', colors[random]);
+  }
+
+}, 1000);
+
+io.on('connection', (socket) => {
+  console.log(`a new user connected.`, socket.id);
+  socket.on('disconnect', () => {
+    console.log("User disconnected.", socket.id);
+  })
+});
 
 module.exports = app;
