@@ -138,10 +138,8 @@ describe("Testing account API", () => {
                     "password": "Pass@123",
                 }).then((response) => {
                     expect(response.statusCode).to.equal(200);
-                    expect(response.body).to.contain.all.keys('data', 'token');
+                    expect(response.body).to.contain.all.keys('token');
                     expect(response.body.token).to.be.a('string');
-                    expect(response.body.data).to.contain.all.keys('role', '_id', 'name', 'email', 'created_at', 'login_at');
-                    expect(response.body.data.role).to.equal('employee');
                     config.EmployeeToken = response.body.token;
                     done();
                 }).catch(err => {
@@ -156,16 +154,43 @@ describe("Testing account API", () => {
                     "password": "Pass@123",
                 }).then((response) => {
                     expect(response.statusCode).to.equal(200);
-                    expect(response.body).to.contain.all.keys('data', 'token');
+                    expect(response.body).to.contain.all.keys('token');
                     expect(response.body.token).to.be.a('string');
-                    expect(response.body.data).to.contain.all.keys('role', 'status', '_id', 'name', 'email', 'created_at', 'login_at');
-                    expect(response.body.data.role).to.equal('manager');
                     config.ManagerToken = response.body.token;
 
                     /**
                      * update configs
                      */
                     fs.writeFileSync(path.join(__dirname, '../config.json'), JSON.stringify(config));
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+
+        it("5. Profile of Employee", (done) => {
+            chai.request(server)
+                .get("/user/profile")
+                .set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body).to.contain.all.keys('data');
+                    expect(response.body.data).to.be.an('object');
+                    expect(response.body.data).to.contain.all.keys('role', 'status', '_id', 'name', 'email', 'login_at');
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("6. Profile of Manager", (done) => {
+            chai.request(server)
+                .get("/user/profile")
+                .set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body).to.contain.all.keys('data');
+                    expect(response.body.data).to.be.an('object');
+                    expect(response.body.data).to.contain.all.keys('role', 'status', '_id', 'name', 'email', 'login_at');
                     done();
                 }).catch(err => {
                     done(err)

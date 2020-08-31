@@ -58,7 +58,7 @@ describe("Manager, Post Crud operations API", () => {
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": ["PHP"],
-                    "role": "trainee",
+                    "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
                     "status": "open"
                 }).set({ "Authorization": `Bearer ${config.ManagerToken}` })
@@ -84,7 +84,7 @@ describe("Manager, Post Crud operations API", () => {
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": ["PHP"],
-                    "role": "trainee",
+                    "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
                     "status": "open"
                 }).set({ "Authorization": `Bearer ${config.ManagerToken}` })
@@ -232,7 +232,7 @@ describe("Manager, Post Crud operations API", () => {
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": [""],
-                    "role": "trainee",
+                    "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
                     "status": "open"
                 }).then((response) => {
@@ -250,7 +250,7 @@ describe("Manager, Post Crud operations API", () => {
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": ["PHP"],
-                    "role": "trainee",
+                    "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
                     "status": "open"
                 }).set({ "Authorization": `Bearer ${config.EmployeeToken}` }).then((response) => {
@@ -268,7 +268,7 @@ describe("Manager, Post Crud operations API", () => {
                     "project_name": "Ginger",
                     "client_name": "Nagarro",
                     "technologies": [""],
-                    "role": "trainee",
+                    "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
                     "status": "open"
                 }).then((response) => {
@@ -287,7 +287,7 @@ describe("Manager, Post Crud operations API", () => {
                     "project_name": "Ginger",
                     "client_name": "Nagarrxo",
                     "technologies": ["PHP"],
-                    "role": "trainee",
+                    "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
                     "status": "open"
                 }).set({ "Authorization": `Bearer ${config.ManagerToken}` })
