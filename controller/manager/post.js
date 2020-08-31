@@ -376,34 +376,48 @@ module.exports.applications = async (req) => {
         }
     } else {
         let limit = 10;
-        let skip = (value.page - 1) * limit;
+        let skip = ((value.page - 1) * limit);
 
         //Check if post is related to that user only
         let post = await Post.findOne({ _id: value.post_id, user_id: req.user._id }).select(['project_name', 'client_name', 'created_at', 'status', 'role']);
 
         if (post) {
             // Get applications
-            let applications = await Application.find({
-                post_id: value.post_id
-            }).populate({
-                path: 'user_id',
-                select: { name: 1, email: 1, _id: 0 }
-            }).select({ post_id: 0 }).sort({ _id: -1 }).limit(limit).skip(skip);
+            let aggregate = [
+                {
+                    $lookup: {
+                        from: "users",
+                        let: { userid: "$user_id" },
+                        pipeline: [{
+                            $match: { $expr: { $eq: ["$_id", { $toObjectId: "$$userid" }] } }
+                        }, {
+                            $project: { _id: 0, name: 1, email: 1, resume: { originalname: 1, filename: 1 } }
+                        }],
+                        as: 'user',
+                    },
+                },
+                { $unwind: "$user" },
+                { $match: { post_id: ObjectId(value.post_id) } },
+                { $sort: { _id: -1 } },
+                {
+                    $project: {
+                        post_id: 1, status: 1, created_at: 1, user: 1
+                    }
+                }
+            ];
 
-            // Get applications count
-            let total = await Application.find({
-                post_id: value.post_id
-            }).populate({
-                path: 'user_id',
-                select: { name: 1, email: 1, _id: 0 }
-            }).select({ post_id: 0 }).countDocuments();
+            let applications = await Application.aggregate([...aggregate, ...[{ $limit: limit + skip }, { $skip: skip }]]);
+            let total = await Application.aggregate([...aggregate, ...[
+                { $group: { _id: null, count: { $sum: 1 } } },
+                { $project: { _id: 0 } }
+            ]]);
 
             return {
                 statusCode: 200,
                 data: {
                     post: post,
                     applications: applications,
-                    total: total
+                    total: total[0].count
                 }
             }
         } else {
