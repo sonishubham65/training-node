@@ -167,5 +167,34 @@ describe("Testing account API", () => {
                     done(err)
                 })
         })
+
+        it("5. Profile of Employee", (done) => {
+            chai.request(server)
+                .get("/user/profile")
+                .set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body).to.contain.all.keys('data');
+                    expect(response.body.data).to.be.an('object');
+                    expect(response.body.data).to.contain.all.keys('role', 'status', '_id', 'name', 'email', 'login_at');
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
+        it("6. Profile of Manager", (done) => {
+            chai.request(server)
+                .get("/user/profile")
+                .set({ "Authorization": `Bearer ${config.EmployeeToken}` })
+                .then((response) => {
+                    expect(response.statusCode).to.equal(200);
+                    expect(response.body).to.contain.all.keys('data');
+                    expect(response.body.data).to.be.an('object');
+                    expect(response.body.data).to.contain.all.keys('role', 'status', '_id', 'name', 'email', 'login_at');
+                    done();
+                }).catch(err => {
+                    done(err)
+                })
+        })
     })
 })
