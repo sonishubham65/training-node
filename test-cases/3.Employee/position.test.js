@@ -47,7 +47,7 @@ describe("Employee Position API", () => {
                     expect(response.body.data.posts).to.be.an("array");
                     if (response.body.data.posts.length > 0) {
                         response.body.data.posts.forEach(post => {
-                            expect(post).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
+                            expect(post).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "description", "created_at");
                             expect(post.technologies).to.be.an('array');
                         })
                     }
@@ -79,7 +79,7 @@ describe("Employee Position API", () => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).that.has.property("data");
                     expect(response.body.data).to.be.an("object");
-                    expect(response.body.data).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
+                    expect(response.body.data).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user", "description", "created_at");
                     expect(response.body.data.technologies).to.be.an('array');
                     expect(response.body.data.user).to.be.an('object');
                     if (response.body.data.application) {
@@ -137,7 +137,7 @@ describe("Employee Position API", () => {
                     expect(response.statusCode).to.equal(200);
                     expect(response.body).that.has.property("data");
                     expect(response.body.data).to.be.an("object");
-                    expect(response.body.data).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user_id", "description", "created_at");
+                    expect(response.body.data).to.contain.all.keys("technologies", "role", "status", "_id", "project_name", "client_name", "user", "description", "created_at");
                     expect(response.body.data.technologies).to.be.an('array');
                     expect(response.body.data.user).to.be.an('object');
                     expect(response.body.data.application).to.be.an('object');
