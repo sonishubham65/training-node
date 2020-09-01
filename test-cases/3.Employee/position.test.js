@@ -122,6 +122,7 @@ describe("Employee Position API", () => {
             chai.request(server)
                 .post(`/position/apply/${config.postId}`).set({ "Authorization": `Bearer ${config.EmployeeToken}` })
                 .then((response) => {
+                    console.log(response)
                     expect(response.statusCode).to.equal(201);
                     expect(response.body).to.be.an('object').that.has.property('message');
                     expect(response.body.message).to.be.a("string");
