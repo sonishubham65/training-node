@@ -209,7 +209,7 @@ module.exports.apply = async (req) => {
                         user_id: post.user_id
                     }).sort({ _id: -1 })
 
-                    if (socket.socket_id) {
+                    if (socket) {
                         io.to(socket.socket_id).emit('application', { id: application._id })
                     }
                     return {
