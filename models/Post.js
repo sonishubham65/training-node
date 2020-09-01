@@ -16,9 +16,8 @@ var postSchema = new Schema({
     },
     description: String,
     status: {
-        type: String,
-        enum: ['open', 'closed'],
-        default: 'open'
+        type: Boolean,
+        default: true
     },
     created_at: { type: Date, default: Date.now },
     updated_at: { type: Date },

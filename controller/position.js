@@ -55,7 +55,7 @@ module.exports.list = async (req) => {
             errorStack: error.details[0].path
         }
     } else {
-        let find = { status: "open" };
+        let find = { status: true };
 
         // Filter by _id
         if (value._id) {
@@ -105,7 +105,7 @@ module.exports.get = async (req) => {
         }
     } else {
         let post = await Post.aggregate([
-            { $match: { _id: ObjectId(value._id), status: "open" } },
+            { $match: { _id: ObjectId(value._id), status: true } },
             {
                 $lookup: {
                     from: "applications",
@@ -199,7 +199,7 @@ module.exports.apply = async (req) => {
             }
         } else {
             //Check if post is activated
-            let post = await Post.findOne({ _id: value._id, status: 'open' })
+            let post = await Post.findOne({ _id: value._id, status: true })
             if (post) {
                 let application = await Application.create({ post_id: value._id, user_id: req.user.id, status: 'applied' });
 

@@ -41,7 +41,7 @@ describe("Manager, Post Crud operations API", () => {
                     "technologies": [""],
                     "role": "trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
-                    "status": "open"
+                    "status": true
                 }).then((response) => {
                     expect(response.statusCode).to.equal(422);
                     expect(response.body).to.be.an('object').that.has.property('message');
@@ -60,7 +60,7 @@ describe("Manager, Post Crud operations API", () => {
                     "technologies": ["PHP"],
                     "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
-                    "status": "open"
+                    "status": true
                 }).set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(201);
@@ -86,7 +86,7 @@ describe("Manager, Post Crud operations API", () => {
                     "technologies": ["PHP"],
                     "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
-                    "status": "open"
+                    "status": true
                 }).set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(201);
@@ -234,7 +234,7 @@ describe("Manager, Post Crud operations API", () => {
                     "technologies": [""],
                     "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
-                    "status": "open"
+                    "status": true
                 }).then((response) => {
                     expect(response.statusCode).to.equal(401);
                     expect(response.body).to.be.an('object').that.has.property('message');
@@ -252,7 +252,7 @@ describe("Manager, Post Crud operations API", () => {
                     "technologies": ["PHP"],
                     "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
-                    "status": "open"
+                    "status": true
                 }).set({ "Authorization": `Bearer ${config.EmployeeToken}` }).then((response) => {
                     expect(response.statusCode).to.equal(403);
                     expect(response.body).to.be.an('object').that.has.property('message');
@@ -270,7 +270,7 @@ describe("Manager, Post Crud operations API", () => {
                     "technologies": [""],
                     "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
-                    "status": "open"
+                    "status": true
                 }).then((response) => {
                     expect(response.statusCode).to.equal(422);
                     expect(response.body).to.be.an('object').that.has.property('message');
@@ -289,7 +289,7 @@ describe("Manager, Post Crud operations API", () => {
                     "technologies": ["PHP"],
                     "role": "Trainee",
                     "description": "The Bot Framework SDK team is happy to announce the General Availability of the consolidated bot framework CLI tool bf-cli.",
-                    "status": "open"
+                    "status": true
                 }).set({ "Authorization": `Bearer ${config.ManagerToken}` })
                 .then((response) => {
                     expect(response.statusCode).to.equal(202);

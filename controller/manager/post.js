@@ -87,7 +87,7 @@ const Schema = {
                 return errors;
             }),
 
-        status: Joi.any().allow('open', 'closed').label("Status").required(),
+        status: Joi.any().allow(true, false).label("Status").required(),
     }),
     // Schema validator for a getting a list of Posts
     list: Joi.object({
