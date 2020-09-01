@@ -76,7 +76,9 @@ module.exports.list = async (req) => {
         if (count) {
 
             //Get the documents
-            posts = await Post.find(find).sort({ _id: -1 }).skip(skip).limit(limit);
+            posts = await Post.find(find).select([
+                "technologies", "_id", "role", "status", "project_name", "client_name", "description", "created_at"
+            ]).sort({ _id: -1 }).skip(skip).limit(limit);
         }
         return {
             statusCode: 200,
@@ -152,9 +154,23 @@ module.exports.get = async (req) => {
                     as: 'user',
                 },
             },
+            {
+                $project: {
+                    "technologies": 1,
+                    "_id": 1,
+                    "role": 1,
+                    "status": 1,
+                    "project_name": 1,
+                    "client_name": 1,
+                    "description": 1,
+                    "created_at": 1,
+                    "user": 1,
+                    "application": 1
+                }
+            },
             { $unwind: '$user' }
         ])
-        if (post.length) {
+        if (post && post.length) {
             post = post[0];
             if (post.application.length) {
                 post.application = post.application[0]
