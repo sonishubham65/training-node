@@ -12,9 +12,7 @@ router.post('/', async (req, res, next) => {
         let response = await post.add(req);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 
@@ -27,9 +25,7 @@ router.get('/page/:page', async (req, res, next) => {
         let response = await post.list(req);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 
@@ -42,9 +38,7 @@ router.get('/:_id', async (req, res, next) => {
         let response = await post.get(req);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 
@@ -57,9 +51,7 @@ router.patch('/:_id', async (req, res, next) => {
         let response = await post.update(req);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 
@@ -72,9 +64,7 @@ router.delete('/:_id', async (req, res, next) => {
         let response = await post.delete(req);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 
@@ -87,9 +77,7 @@ router.get('/:post_id/application/page/:page', async (req, res, next) => {
         let response = await post.applications(req);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 
@@ -102,9 +90,7 @@ router.get('/application/details/:_id', async (req, res, next) => {
         let response = await post.application(req);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 /**
@@ -115,9 +101,7 @@ router.get('/application/resume/:_id', async (req, res, next) => {
     try {
         await post.resume(req, res);
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 module.exports = router;

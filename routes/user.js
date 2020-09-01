@@ -13,9 +13,7 @@ router.post('/signup', async (req, res, next) => {
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack })
   } catch (e) {
     //Handle all the uncaught errors.
-    res.status(500).json({
-      message: e.message
-    })
+    next(e);
   }
 });
 
@@ -30,9 +28,7 @@ router.post('/login', async (req, res, next) => {
     }
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data, token: response.token })
   } catch (e) {
-    res.status(500).json({
-      message: e.message
-    })
+    next(e);
   }
 });
 
@@ -41,9 +37,7 @@ router.get('/profile', authentication, async (req, res, next) => {
     let response = await user.profile(req);
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
   } catch (e) {
-    res.status(500).json({
-      message: e.message
-    })
+    next(e);
   }
 });
 
@@ -52,9 +46,7 @@ router.get('/authorize', async (req, res, next) => {
     let response = await user.authorize(req);
     res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data, token: response.token })
   } catch (e) {
-    res.status(500).json({
-      message: e.message
-    })
+    next(e);
   }
 });
 

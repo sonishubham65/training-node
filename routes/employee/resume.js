@@ -10,9 +10,7 @@ router.put('/', async (req, res, next) => {
         let response = await resume.update(req, res);
         res.status(response.statusCode).json({ message: response.message, errorStack: response.errorStack, data: response.data })
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 /**
@@ -23,9 +21,7 @@ router.get('/', async (req, res, next) => {
     try {
         await resume.download(req, res);
     } catch (e) {
-        res.status(500).json({
-            message: e.message
-        })
+        next(e);
     }
 });
 module.exports = router;
