@@ -1,0 +1,726 @@
+{
+	"info": {
+		"_postman_id": "7813166e-2403-4dff-8389-b694e3bcea21",
+		"name": "training",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "user",
+			"item": [
+				{
+					"name": "Signup",
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"name\":\"Yogesh\",\r\n    \"email\":\"employee3@nagarro.com\",\r\n    \"password\":\"Pass@123\",\r\n    \"role\":\"employee\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseuri}}/user/signup",
+							"host": [
+								"{{baseuri}}"
+							],
+							"path": [
+								"user",
+								"signup"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\r\n    \"email\":\"shubham@nagarro.com\",\r\n    \"password\":\"Pass@123\"\r\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseuri}}/user/login",
+							"host": [
+								"{{baseuri}}"
+							],
+							"path": [
+								"user",
+								"login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "authorize",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseuri}}/user/authorize",
+							"host": [
+								"{{baseuri}}"
+							],
+							"path": [
+								"user",
+								"authorize"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Profile",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ManagerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseuri}}/user/profile",
+							"host": [
+								"{{baseuri}}"
+							],
+							"path": [
+								"user",
+								"profile"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "position",
+			"item": [
+				{
+					"name": "Positions",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{ManagerToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseuri}}/position/page/1",
+							"host": [
+								"{{baseuri}}"
+							],
+							"path": [
+								"position",
+								"page",
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Position",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{EmployeeToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseuri}}/position/5f4cb1bf245d4d87102236d1",
+							"host": [
+								"{{baseuri}}"
+							],
+							"path": [
+								"position",
+								"5f4cb1bf245d4d87102236d1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Apply",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{EmployeeToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseuri}}/position/apply/5f4cd424c09f81788c7ad742",
+							"host": [
+								"{{baseuri}}"
+							],
+							"path": [
+								"position",
+								"apply",
+								"5f4cd424c09f81788c7ad742"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "employee",
+			"item": [
+				{
+					"name": "upload resume",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{EmployeeToken2}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "resume",
+									"type": "file",
+									"src": "/C:/Users/subhamsoni/Desktop/resumes/Resume.docx"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseuri}}/employee/resume",
+							"host": [
+								"{{baseuri}}"
+							],
+							"path": [
+								"employee",
+								"resume"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "download resume",
+					"protocolProfileBehavior": {
+						"disableBodyPruning": true
+					},
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{EmployeeToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": []
+						},
+						"url": {
+							"raw": "{{baseuri}}/employee/resume",
+							"host": [
+								"{{baseuri}}"
+							],
+							"path": [
+								"employee",
+								"resume"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "manager",
+			"item": [
+				{
+					"name": "post",
+					"item": [
+						{
+							"name": "add",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ManagerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"project_name\":\"Mixtura production\",\r\n    \"client_name\":\"Gtoni\",\r\n    \"technologies\":[\"IO\"],\r\n    \"role\":\"Trainee\",\r\n    \"description\":\"Zimardi offerZimardi offerZimardi offerZimardi offerZimardi offerZimardi offerZimardi offerZimardi offerZimardi offerZimardi offerZimardi offerZimardi offer\",\r\n    \"status\":true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseuri}}/manager/post",
+									"host": [
+										"{{baseuri}}"
+									],
+									"path": [
+										"manager",
+										"post"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "list",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ManagerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseuri}}/manager/post/page/1?project_name=mix",
+									"host": [
+										"{{baseuri}}"
+									],
+									"path": [
+										"manager",
+										"post",
+										"page",
+										"1"
+									],
+									"query": [
+										{
+											"key": "project_name",
+											"value": "mix"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "post",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ManagerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseuri}}/manager/post/5f2b8a8eb2184a39b4fc87e7",
+									"host": [
+										"{{baseuri}}"
+									],
+									"path": [
+										"manager",
+										"post",
+										"5f2b8a8eb2184a39b4fc87e7"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "application detail",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ManagerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseuri}}/manager/post/application/details/5f4601f2b050135280fab993",
+									"host": [
+										"{{baseuri}}"
+									],
+									"path": [
+										"manager",
+										"post",
+										"application",
+										"details",
+										"5f4601f2b050135280fab993"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "update",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ManagerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\r\n    \"project_name\":\"Yourenacar\",\r\n    \"client_name\":\"Rental Cars\",\r\n    \"technologies\":[\"PHP\",\"Mysql\",\"Opencartx\"],\r\n    \"role\":\"Trainee\",\r\n    \"description\":\"www.yourentcar.ma. Highlights info row image. Community. Page TransparencySee More. Facebook is showing information to help you better understand the\",\r\n    \"status\":true\r\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseuri}}/manager/post/5f34cf4f79aa886bd47ed35f",
+									"host": [
+										"{{baseuri}}"
+									],
+									"path": [
+										"manager",
+										"post",
+										"5f34cf4f79aa886bd47ed35f"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "delete",
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ManagerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseuri}}/manager/post/5f293b2076fcf00d8442a4f6",
+									"host": [
+										"{{baseuri}}"
+									],
+									"path": [
+										"manager",
+										"post",
+										"5f293b2076fcf00d8442a4f6"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "application list",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ManagerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseuri}}/manager/post/5f4cb1bf245d4d87102236d1/application/page/1",
+									"host": [
+										"{{baseuri}}"
+									],
+									"path": [
+										"manager",
+										"post",
+										"5f4cb1bf245d4d87102236d1",
+										"application",
+										"page",
+										"1"
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "application resume download",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"auth": {
+									"type": "bearer",
+									"bearer": [
+										{
+											"key": "token",
+											"value": "{{ManagerToken}}",
+											"type": "string"
+										}
+									]
+								},
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseuri}}/manager/post/application/resume/5f4601f2b050135280fab993",
+									"host": [
+										"{{baseuri}}"
+									],
+									"path": [
+										"manager",
+										"post",
+										"application",
+										"resume",
+										"5f4601f2b050135280fab993"
+									]
+								}
+							},
+							"response": []
+						}
+					],
+					"protocolProfileBehavior": {},
+					"_postman_isSubFolder": true
+				}
+			],
+			"protocolProfileBehavior": {}
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "b56d5cf4-afb6-4f86-ab3e-7f80b0a6fdc7",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "ba8220dd-c434-4574-8169-45c568118185",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"id": "57c17505-259c-405b-9cc0-806c8fd38eb6",
+			"key": "baseuri",
+			"value": "http://localhost:3000"
+		},
+		{
+			"id": "69feccb7-b203-41ef-b6c6-c484bfaf41df",
+			"key": "EmployeeToken",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjRjYjA1NjI0NWQ0ZDg3MTAyMjM2YzMiLCJleHAiOjE2MDE5NTMwNjYsImlhdCI6MTU5ODk1MzA2Nn0.boUv8Fzz0ztX4T4ZY9pP1Ye3O2ow455txxJPbZR47_Q"
+		},
+		{
+			"id": "e318e445-9080-436d-9224-75f148679a0c",
+			"key": "ManagerToken",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjRjYjBhODI0NWQ0ZDg3MTAyMjM2YzkiLCJleHAiOjE2MDE5NTE3MDYsImlhdCI6MTU5ODk1MTcwNn0.Bb9y-qD3fPnPxIFiYLHAsYCIcjTdLiTT5q1Pl76gOn8"
+		},
+		{
+			"id": "00ab406c-5517-483c-9345-fd1f7cb04ab8",
+			"key": "EmployeeToken2",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjQ2M2MyZWNlN2NkYjUyYmNjNzlhOTMiLCJleHAiOjE1OTg0NDczNjUsImlhdCI6MTU5ODQ0NzA2NX0.fGVnlI5gFn-Hcuehr3Bf2OXRqpWUYZxrjU8gMRhFWLA"
+		},
+		{
+			"id": "7a21ef62-161b-4ab0-b44e-a8422a5f1937",
+			"key": "EmployeeToken3",
+			"value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI1ZjQ2NjhjMzE3M2NmMzQwZjQzMGQ1OWMiLCJleHAiOjE1OTg0NTAxNjcsImlhdCI6MTU5ODQ0OTg2N30.Re0i3GrGLO4KbJE09OaPyldaAjP5SOS73bCqodgFy8Q"
+		}
+	],
+	"protocolProfileBehavior": {}
+}
